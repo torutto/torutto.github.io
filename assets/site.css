@@ -216,6 +216,15 @@ a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
   text-decoration-thickness: 1px;
   text-underline-offset: 0.4em;
 }
+/* 名前とメニューは途中で折り返さない（375px幅で「TORUTT／O」と割れていた） */
+.brand-name,
+.site-nav a { white-space: nowrap; }
+@media (max-width: 400px) {
+  .site-header .wrap { gap: 8px; }
+  .brand { gap: 8px; }
+  .brand-name { letter-spacing: 0.08em; }
+  .site-nav a { padding-inline: 6px; }
+}
 
 .site-footer {
   border-top: 1px solid var(--rule);
