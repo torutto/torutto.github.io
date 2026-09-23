@@ -6,9 +6,8 @@
 <title>TORUTTO（トルット）｜撮るだけで、投稿できるVlogに。</title>
 <meta name="description" content="撮った順のまま、色と文字と音をととのえて、横型の一本に仕上げるiPhoneのカメラです。無料でも1080p・10分までの一本を、ロゴなしで完成できます。">
 <link rel="canonical" href="https://torutto.github.io/">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#FCF9F2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FCF9F2">
 <meta name="format-detection" content="telephone=no">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta property="og:type" content="website">
@@ -27,9 +26,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/ZenKakuGothicNew-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ZenOldMincho-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=752217ae">
+<link rel="stylesheet" href="assets/site.css?v=17c62171">
 </head>
-<body>
+<body class="has-opening">
 <a class="skip-link" href="#main">本文へ移動</a>
 <header class="site-header">
   <div class="wrap">
@@ -43,15 +42,15 @@
   </div>
 </header>
 <main id="main">
-<section class="hero" aria-labelledby="hero-title">
-  <div class="wrap">
-    <p class="eyebrow">TORUTTO（トルット）</p>
-    <h1 id="hero-title" class="hero-title">撮るだけで、<wbr>投稿できる<wbr>Vlogに。</h1>
-    <p class="lead">撮った順のまま、<wbr>色と文字と音をととのえて、<wbr>横型の一本に仕上げる<wbr>iPhoneのカメラです。</p>
-    <div class="store-cta"><p class="availability"><span class="status">App Storeで近日公開</span><span>iPhone（iOS 26以上）</span><span>本体無料</span></p></div>
-  </div>
-  <div class="wrap wrap-wide">
-    <figure class="hero-media"><div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/window-1-1440.jpg" width="1280" height="720" aria-label="窓辺のキャットタワーでくつろぐ猫の映像（音声なし）"><source src="media/hero.mp4" type="video/mp4"></video><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></div></figure>
+<section class="opening" aria-labelledby="hero-title">
+  <figure class="opening-media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/hero-1440.jpg" width="1280" height="720" aria-label="撮った順に、桜と空、湖とボート、街の夕焼け、なでられる猫、器のごはんの短い映像がつながる動画（音声なし）"><source src="media/hero.mp4" type="video/mp4"></video><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></figure><div class="opening-shade" aria-hidden="true"></div>
+  <div class="opening-title">
+    <div class="wrap">
+      <h1 id="hero-title">撮るだけで、<wbr>投稿できる<wbr>Vlogに。</h1>
+      <div class="obi" aria-hidden="true"><i class="sky" style="flex:3"></i><i class="leaf" style="flex:4"></i><i class="sakura" style="flex:7"></i><i class="lemon" style="flex:4"></i><i class="amber" style="flex:3"></i></div>
+      <p class="lead">撮った順のまま、<wbr>色と文字と音をととのえて、<wbr>横型の一本に仕上げる<wbr>iPhoneのカメラです。</p>
+      <div class="store-cta"><p class="availability"><span class="status">App Storeで近日公開</span><span>iPhone（iOS 26以上）</span><span>本体無料</span></p></div>
+    </div>
   </div>
 </section>
 
@@ -67,17 +66,22 @@
   </div>
 </section>
 
-<section class="section pillar pillar-wide" aria-labelledby="p1-title">
-  <div class="wrap pillar-grid">
-    <div class="pillar-text">
-      <h2 id="p1-title">撮るだけで、<wbr>一本になる。</h2>
-      <div class="pillar-body">
-        <p>撮った順のまま、素材がVlogの形に並びます。はじまりと終わり、タイトルとサムネイルまで、ひと続きで仕上がります。</p>
-        <p>アプリが勝手に並べ替えることはありません。元の素材も書き換えません。</p>
-      </div>
+<section class="section order" aria-labelledby="p1-title">
+  <div class="wrap">
+    <h2 id="p1-title">撮るだけで、<wbr>一本になる。</h2>
+    <div class="blocks" role="img" aria-label="3秒、5秒、10秒、5秒、3秒の短いクリップが、撮った順に並んだ帯">
+      <div class="b3 sky"><b>3</b><small>秒</small></div>
+      <div class="b5 leaf"><b>5</b><small>秒</small></div>
+      <div class="b10 sakura"><b>10</b><small>秒</small></div>
+      <div class="b5 lemon"><b>5</b><small>秒</small></div>
+      <div class="b3 amber"><b>3</b><small>秒</small></div>
     </div>
-    <figure class="pillar-media motion">
-      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-strip.jpg" width="1280" height="720" aria-label="撮った順の4つの短い映像が帯の上に並び、一本の横長の映像になって流れる動画（音声なし）。最後にトルットのアイコンになる"><source src="media/motion-strip.mp4" type="video/mp4"></video></div><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button>
+    <div class="order-body">
+      <p>撮った順のまま、素材がVlogの形に並びます。はじまりと終わり、タイトルとサムネイルまで、ひと続きで仕上がります。</p>
+      <p>アプリが勝手に並べ替えることはありません。元の素材も書き換えません。</p>
+    </div>
+    <figure class="motion">
+      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-strip.jpg" width="1280" height="720" aria-label="撮った順の5つの短い映像（桜と空、湖とボート、街の夕焼け、猫、ごはん）が帯の上に並び、一本の横長の映像になって流れる動画（音声なし）。見出し「撮るだけで、投稿できるVlogに。」が出て、最後にトルットのアイコンになる"><source src="media/motion-strip.mp4" type="video/mp4"></video></div><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button>
       <figcaption>撮った順に、そのまま並びます。</figcaption>
     </figure>
   </div>
@@ -108,7 +112,7 @@
       </div>
     </div>
     <figure class="pillar-media">
-      <div class="media"><picture><source type="image/avif" srcset="media/sink-2-480.avif 480w, media/sink-2-960.avif 960w, media/sink-2-1440.avif 1440w, media/sink-2-1920.avif 1920w" sizes="(min-width: 960px) 740px, 100vw"><img src="media/sink-2-960.jpg" srcset="media/sink-2-480.jpg 480w, media/sink-2-960.jpg 960w, media/sink-2-1440.jpg 1440w, media/sink-2-1920.jpg 1920w" sizes="(min-width: 960px) 740px, 100vw" width="1920" height="1080" alt="洗面台のふちに手をかけて、こちらを見る猫" loading="lazy" decoding="async"></picture></div>
+      <div class="media"><picture><source type="image/avif" srcset="media/nap-480.avif 480w, media/nap-960.avif 960w, media/nap-1440.avif 1440w, media/nap-1920.avif 1920w" sizes="(min-width: 960px) 740px, 100vw"><img src="media/nap-960.jpg" srcset="media/nap-480.jpg 480w, media/nap-960.jpg 960w, media/nap-1440.jpg 1440w, media/nap-1920.jpg 1920w" sizes="(min-width: 960px) 740px, 100vw" width="1920" height="1080" alt="部屋の布団の上で、丸くなって眠る猫" loading="lazy" decoding="async"></picture></div>
     </figure>
   </div>
 </section>
@@ -123,7 +127,7 @@
       </div>
     </div>
     <figure class="pillar-media">
-      <div class="media"><picture><source type="image/avif" srcset="media/window-2-480.avif 480w, media/window-2-960.avif 960w, media/window-2-1440.avif 1440w, media/window-2-1920.avif 1920w" sizes="(min-width: 960px) 740px, 100vw"><img src="media/window-2-960.jpg" srcset="media/window-2-480.jpg 480w, media/window-2-960.jpg 960w, media/window-2-1440.jpg 1440w, media/window-2-1920.jpg 1920w" sizes="(min-width: 960px) 740px, 100vw" width="1920" height="1080" alt="キャットタワーの器の中で体をのばす猫" loading="lazy" decoding="async"></picture></div>
+      <div class="media"><picture><source type="image/avif" srcset="media/lake-480.avif 480w, media/lake-960.avif 960w, media/lake-1440.avif 1440w, media/lake-1920.avif 1920w" sizes="(min-width: 960px) 740px, 100vw"><img src="media/lake-960.jpg" srcset="media/lake-480.jpg 480w, media/lake-960.jpg 960w, media/lake-1440.jpg 1440w, media/lake-1920.jpg 1920w" sizes="(min-width: 960px) 740px, 100vw" width="1920" height="1080" alt="晴れた湖のほとりに並ぶ、水色の貸しボート" loading="lazy" decoding="async"></picture></div>
     </figure>
   </div>
 </section>
@@ -140,7 +144,7 @@
         <dt>ととのう</dt>
         <dd>撮った順のまま、色と文字と音が重なります。元の素材は書き換えません。</dd>
       </div>
-      <div class="flow-row flow-row-now">
+      <div class="flow-row">
         <dt>完成</dt>
         <dd>横16:9の一本を、写真アプリへ保存したり、共有したりできます。</dd>
       </div>
@@ -186,7 +190,6 @@
   <div class="wrap">
     <div class="store-cta"><p class="store-soon">App Storeで近日公開</p><p class="availability"><span>iPhone（iOS 26以上）</span><span>本体無料</span></p></div>
     <p id="closing-title" class="closing-line mincho">撮ると、一本になる。</p>
-    <div class="strip strip-closing" aria-hidden="true"><span style="flex:1"></span><span style="flex:2"></span><span style="flex:3"></span><span style="flex:2"></span></div>
   </div>
 </section>
 </main>
