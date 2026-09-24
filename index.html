@@ -26,7 +26,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/ZenKakuGothicNew-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ZenOldMincho-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=b1a50254">
+<link rel="stylesheet" href="assets/site.css?v=2f01a74a">
 </head>
 <body class="has-opening">
 <a class="skip-link" href="#main">本文へ移動</a>
@@ -82,7 +82,7 @@
       <p>アプリが勝手に並べ替えることはありません。元の素材も書き換えません。</p>
     </div>
     <figure class="motion">
-      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-strip.jpg" width="1280" height="720" aria-label="撮った順の5つの短い映像（桜と空、湖とボート、街の夕焼け、猫、ごはん）が帯の上に並び、一本の横長の映像になって流れる動画（音声なし）。見出し「撮るだけで、投稿できるVlogに。」が出て、最後にトルットのアイコンになる"><source src="media/motion-strip.mp4" type="video/mp4"></video></div><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button>
+      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-strip.jpg" width="1280" height="720" aria-label="撮った順の5つの短い映像（桜と空、湖とボート、街の夕焼け、猫、ごはん）が帯の上に並び、一本の横長の映像になって流れる動画（音声なし）。見出し「撮るだけで、投稿できるVlogに。」が出て、最後にトルットのアイコンになる"><source src="media/motion-strip.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></span>
       <figcaption>撮った順に、そのまま並びます。</figcaption>
     </figure>
   </div>
@@ -150,6 +150,10 @@
         <dd>横16:9の一本を、写真アプリへ保存したり、共有したりできます。</dd>
       </div>
     </dl>
+    <figure class="motion">
+      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-sketch.jpg" width="1280" height="720" aria-label="手描きのトルンの短いアニメ（音楽と効果音つき。はじめは音なし）。卵から育ったトルンがiPhoneで5回撮ると、撮った場面のカード（桜と空、湖とボート、街の夕焼け、猫、ごはん）が撮った順に出てくる。トルンが両手でカードを自分の窓へ押し込むと、窓の中で一本の映像になって流れる。最後にトルンの手足が外れて足元に並び、トルットのアイコンの形になって「撮ると、一本になる。」と出る"><source src="media/motion-sketch.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button><button class="video-toggle video-sound" type="button" hidden data-on="音を出す" data-off="音を消す">音を出す</button></span>
+      <figcaption>トルンが撮ると、こうなります。</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -272,7 +276,19 @@
     });
   }, { threshold: 0.35 }) : null;
   Array.prototype.forEach.call(videos, function (v) {
-    var b = v.closest('figure').querySelector('.video-toggle');
+    var fig = v.closest('figure');
+    var snd = fig.querySelector('.video-sound');
+    if (snd) {
+      var sLabel = function () { snd.textContent = v.muted ? snd.dataset.on : snd.dataset.off; snd.setAttribute('aria-pressed', v.muted ? 'false' : 'true'); };
+      snd.hidden = false;
+      snd.addEventListener('click', function () {
+        v.muted = !v.muted;
+        if (!v.muted && v.paused) { delete v.dataset.stopped; var p2 = v.play(); if (p2 && p2.catch) p2.catch(function () {}); }
+        sLabel();
+      });
+      sLabel();
+    }
+    var b = fig.querySelector('.video-toggle:not(.video-sound)');
     if (!b) return;
     var label = function () { b.textContent = v.paused ? b.dataset.play : b.dataset.pause; };
     b.hidden = false;

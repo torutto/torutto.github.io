@@ -566,14 +566,19 @@ figcaption {
 }
 .motion .media { grid-column: 1 / -1; background: var(--paper); }
 .motion figcaption { grid-column: 1; grid-row: 2; }
-.motion .video-toggle {
+.motion .video-controls {
   grid-column: 2;
   grid-row: 2;
+  display: flex;
+  gap: 8px;
   margin-top: 6px;
+}
+.motion .video-toggle {
   border: 1px solid var(--rule);
   background: transparent;
   color: var(--ink);
 }
+.flow .motion { margin-top: clamp(40px, 5vw, 64px); }
 
 /* ── トップ: 流れ（墨の罫で組む） ── */
 
