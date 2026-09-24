@@ -832,11 +832,11 @@ figcaption {
   }
 }
 
-/* ── トルン（手描きの線・C。BRAND.md §7）: 脇役の所だけ、1画面に1体 ── */
+/* ── トルン（launch/torun/torun.js。BRAND.md §7）: 脇役の所だけ、1画面に1体。横長なので枠は 4:3 ── */
 .torun-spot {
   display: inline-block;
   width: var(--torun, 96px);
-  height: var(--torun, 96px);
+  height: var(--torun-h, 72px);
   vertical-align: middle;
 }
 .torun-spot canvas {

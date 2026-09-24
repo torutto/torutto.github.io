@@ -26,7 +26,7 @@
 <link rel="apple-touch-icon" href="https://torutto.github.io/apple-touch-icon.png">
 <link rel="preload" href="https://torutto.github.io/fonts/ZenKakuGothicNew-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="https://torutto.github.io/fonts/ZenOldMincho-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="https://torutto.github.io/assets/site.css?v=8e73e45b">
+<link rel="stylesheet" href="https://torutto.github.io/assets/site.css?v=b1a50254">
 </head>
 <body>
 <a class="skip-link" href="#main">本文へ移動</a>
@@ -44,7 +44,7 @@
 <main id="main">
 <section class="page-head notfound" aria-labelledby="page-title">
   <div class="wrap narrow">
-    <span class="torun-spot" style="--torun:112px" aria-hidden="true"><canvas class="torun" width="224" height="224"></canvas></span>
+    <span class="torun-spot" style="--torun:112px;--torun-h:84px" aria-hidden="true"><canvas class="torun" width="224" height="168"></canvas></span>
     <h1 id="page-title">ページが<wbr>見つかりません。</h1>
     <p class="lead">アドレスが変わったか、なくなった可能性があります。</p>
     <p><a href="https://torutto.github.io/">トップへ戻る</a></p>
@@ -69,73 +69,589 @@
   </div>
 </footer>
 <script>
-(function () {
-  var cs = document.querySelectorAll('canvas.torun');
-  if (!cs.length) return;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var BASE = [[0.36, 0.53, 0.37], [0.61, 0.55, 0.33], [0.72, 0.33, 0.20]];
-  var PER = [3.6, 4.7, 5.4];
-  var LB = BASE.map(function (b) { return [0.5 + (b[0] - 0.5) * 0.62, 0.53 + (b[1] - 0.5) * 0.62, b[2] * 0.62]; });
-  var INK = '#2E241F', BODY = '#EADFCE', HATCH = '#8C7B67', BLUSH = '#E7836E';
-  function field(L, x, y) { var f = 0; for (var i = 0; i < 3; i++) { var dx = x - L[i][0], dy = y - L[i][1]; f += L[i][2] * L[i][2] / Math.max(dx * dx + dy * dy, 1e-5); } return f; }
-  function poke(st, t) { if (st.pokeAt < 0) return 0; var d = t - st.pokeAt; if (d < 0.12) return d / 0.12; var k = d - 0.12; return Math.exp(-k * 7.5) * Math.cos(k * 13); }
-  function lobes(st, t) {
-    var br = 1 + 0.012 * Math.sin(t * 1.25), p = poke(st, t), sq = 1 - 0.16 * p, stt = 1 + 0.10 * p;
-    return LB.map(function (b, i) {
-      var ph = i * 1.9, w = 2 * Math.PI / PER[i];
-      var dx = 0.014 * Math.sin(t * w + ph), dy = 0.014 * Math.cos(t * w * 0.9 + ph);
-      var near = 1; if (st.pokeAt >= 0) { var d = Math.hypot(b[0] - st.px, b[1] - st.py); near = 1.25 - Math.min(d * 1.4, 0.7); }
-      return [0.5 + (b[0] + dx - 0.5) * (1 + (stt - 1) * near), 0.78 - (0.78 - (b[1] + dy)) * (1 - (1 - sq) * near), b[2] * br];
-    });
+/*!
+ * torun.js — トルンの正式な描画（手描きの線）。依存なし・ES5。
+ * 正本: docs/design/TORUN_MASCOT.md「姿の決定（2026-09-24）」、使い方と数値: launch/torun/README.md
+ *
+ *   Torun.draw(ctx, opts)      1コマ描く（同じ opts なら同じ絵。背景は透明）
+ *   Torun.measure(opts)        描く範囲 {left, top, right, bottom}（x, y からの px）
+ *   Torun.mount(canvas, opts)  サイト用: 見えている間だけ線をゆらし、まばたき、押すとぷにっ
+ *   Torun.mountAll(selector)   canvas を全部 mount（data-stage / data-face / data-pose を読む）
+ *   Torun.blinkAt(t, seed)     動画用の決定的なまばたき（0〜1）。Torun.squashAt(dt) 押してからの潰れ
+ *   Torun.geometry(opts)       寸法（体の幅 = 1）。Torun.spec / Torun.colors 寸法と色の表
+ *
+ * 座標: (x, y) は足元の中央（床の線）。size は大人の体（枠）の幅の px。卵・子も同じ size で描くと大きさがそろう。
+ */
+(function (root) {
+  'use strict';
+
+  // ------------------------------------------------------------------ 色
+  var C = {
+    ink: '#2E241F',      // 線・目・口・アイコンの枠
+    body: '#EADFCE',     // 体（枠）のクリーム
+    hatch: '#8C7B67',    // 斜線の影
+    blush: '#E7836E',    // 頬の斜線・開いた口の舌
+    window: '#FFFDF8',   // 窓（無地の紙色）
+    paper: '#FCF9F2',    // 紙（背景に使う側の色。torun.js は背景を塗らない）
+    sky: '#9CCBE3',      // 左足（1番目に撮った）
+    leaf: '#B3D38A',     // 右足（2番目）
+    sakura: '#F0B7C4',   // 左手（3番目）
+    lemon: '#F6D26B',    // 右手（4番目）
+    amber: '#FA9C1A',    // 頭の飾り（5番目＝いま）
+    lens: '#6B5E54'      // 小物（iPhone）のレンズ
+  };
+
+  // ------------------------------------------------------------------ 寸法（大人の体の幅 = 1）
+  // 第4版 ①清書 を ③ちび へ 1/4 だけ寄せた値。① と ③ の値は README の表を見る。
+  var S = {
+    stage: {
+      egg:   { w: 0.47, h: 0.56 },
+      child: { w: 0.79, h: 0.545, r: 0.19, face: 1.64, legX: 0.245, legK: 0.9 },
+      adult: { w: 1.00, h: 0.61,  r: 0.20, face: 1.95, legX: 0.265, legK: 1.0 }
+    },
+    soft: 1.1,           // 枠のふくらみ（下辺と左右が少し外へ）
+    bezel: 0.155,        // 枠の太さ（体の高さに対して）
+    winR: 0.097,         // 窓の角の丸み
+    th: 0.097,           // 手足のカプセルの太さ（全部同じ）
+    leg: 0.18,           // 足の長さ
+    arm: 0.20,           // 手の長さ
+    head: 0.24,          // 頭の飾りの長さ
+    headTh: 0.84,        // 頭の飾りの太さ（手足の太さに対して）
+    embed: 0.35,         // 手足の付け根を体に埋める量（太さに対して）
+    armX: 0.036, armY: 0.08,   // 手の付け根: 体の横端から内へ / 体の中心から下へ
+    // 線
+    line: 0.0164,        // 輪郭の主線（体）。カプセル ×0.8、窓 ×0.7。最小 2px
+    faint: 0.006,        // 重ね線の太さ。不透明度 0.35、ずらし ±0.0045
+    faintOff: 0.009,
+    jitBody: 0.008,      // 輪郭の点のゆれ幅（体・卵・小物）。±半分
+    jitCap: 0.004,       // 輪郭の点のゆれ幅（カプセル）
+    ptsBody: 96, ptsCap: 64, ptsSmall: 56, ptsCapSmall: 40,
+    fps: 10,             // 線のゆれ: 1秒に10回（floor(t*10)）
+    hatchLw: 0.0067, hatchStep: 0.039, hatchA: 0.45, hatchFrom: 0.2, // 斜線（体の中心から高さ×0.2より下）
+    hatchDir: [0.78, -0.625],                                         // 斜線の向き（右上がり約39°）
+    shadowRx: [0.36, 0.31, 0.26, 0.21], shadowRy: 0.024, shadowDy: 0.0075, shadowA: 0.3, shadowW: 0.95,
+    // 顔（face 単位 = 体の幅 × stage.face / 1。下の値に stage.face を掛ける）
+    face: {
+      base:  { eye: 'dot', sep: 0.094, dy: 0.02, mouth: 'arc', mw: 0.020 }, // ⑧ 離れ目・低め（基本）
+      wide:  { eye: 'dot', sep: 0.072, dy: 0.0,  mouth: 'arc', mw: 0.024 }, // ① 今の目の間隔（寄り目・高め）
+      happy: { eye: 'arc', sep: 0.094, dy: 0.02, mouth: 'arc', mw: 0.024 }, // ③ にっこり閉じ目
+      open:  { eye: 'dot', sep: 0.094, dy: 0.02, mouth: 'D' }               // ⑤ 少し開いた口
+    },
+    eyeRx: 0.017, eyeRy: 0.021, faceY: -0.02, mouthY: 0.03, blushX: 0.036, blushY: 0.042,
+    // 押したときの潰れ（squash = 1 で）
+    squashX: 0.10, squashY: 0.16,
+    // 32px 前後（small）
+    small: { th: 1.7, leg: 1.25, arm: 1.1, head: 1.25, line: 1.4 },
+    // アプリアイコン（BrandIcon.svg、1024 の座標）。枠 614×345 r40、帯は枠の下 76、高さ 40
+    icon: { frame: [205, 281, 614, 345, 40], bandY: 702, bandH: 40,
+      segs4: [[205, 272.4], [287.4, 422.2], [467.1, 669.2], [684.2, 819]],
+      segs5: [[205, 272.4], [287.4, 422.2], [467.1, 564.6], [572.6, 669.2], [684.2, 819]] }
+  };
+
+  var D = Math.PI / 180;
+  var ORDER = ['lf', 'rf', 'lh', 'rh', 'hd'];          // 撮った順＝帯を左から読む順
+  var PART_COL = { lf: C.sky, rf: C.leaf, lh: C.sakura, rh: C.lemon, hd: C.amber };
+
+  // ------------------------------------------------------------------ 小道具
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function ease(v) { v = clamp01(v); return v * v * (3 - 2 * v); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function hex(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+  function mix(a, b, t) {
+    if (t <= 0) return a; if (t >= 1) return b;
+    var A = hex(a), B = hex(b), o = [];
+    for (var i = 0; i < 3; i++) o.push(Math.round(A[i] + (B[i] - A[i]) * t));
+    return 'rgb(' + o.join(',') + ')';
   }
-  function face(L) { var a0 = L[0][2] * L[0][2], a1 = L[1][2] * L[1][2]; return [(L[0][0] * a0 + L[1][0] * a1) / (a0 + a1) + 0.015, (L[0][1] * a0 + L[1][1] * a1) / (a0 + a1) + 0.035]; }
-  function blink(st, t) { if (t > st.nb) { st.ba = t; st.nb = t + 2.6 + Math.random() * 2.8; } var d = t - st.ba; return (d >= 0 && d < 0.14) ? Math.max(0.08, Math.abs(d - 0.07) / 0.07) : 1; }
-  function draw(st, t) {
-    var c = st.c, ctx = c.getContext('2d'), W = c.width, H = c.height;
-    var fr = Math.floor(t * 10), L = lobes(st, fr / 10);
-    var cx = (L[0][0] + L[1][0]) / 2, cy = (L[0][1] + L[1][1]) / 2;
-    var seed = (fr * 9301 + 49297) % 233280; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280 - 0.5; }
-    var N = 72, pts = [];
-    for (var i = 0; i < N; i++) { var a = i / N * Math.PI * 2, r = 0.02; while (r < 0.6 && field(L, cx + Math.cos(a) * r, cy + Math.sin(a) * r) >= 1) r += 0.004; pts.push([(cx + Math.cos(a) * r + rnd() * 0.0045) * W, (cy + Math.sin(a) * r + rnd() * 0.0045) * H]); }
-    function path() { ctx.beginPath(); for (var i = 0; i <= N; i++) { var p = pts[i % N], q = pts[(i + 1) % N], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; if (i === 0) ctx.moveTo(mx, my); else ctx.quadraticCurveTo(p[0], p[1], mx, my); } ctx.closePath(); }
-    ctx.clearRect(0, 0, W, H);
-    ctx.save(); ctx.strokeStyle = INK; ctx.globalAlpha = 0.3; ctx.lineWidth = Math.max(1, W * 0.004);
-    for (var k = 0; k < 4; k++) { ctx.beginPath(); ctx.ellipse(0.5 * W + rnd() * W * 0.01, 0.81 * H + k * W * 0.005, W * (0.24 - k * 0.035), W * 0.018, 0, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.restore();
-    path(); ctx.fillStyle = BODY; ctx.fill();
-    ctx.save(); path(); ctx.clip(); ctx.strokeStyle = HATCH; ctx.lineWidth = Math.max(1, W * 0.0045); ctx.lineCap = 'round'; ctx.globalAlpha = 0.45;
-    for (var h = -10; h < 30; h++) { var x0 = h * W * 0.026, y0 = cy * H + W * 0.03; ctx.beginPath(); ctx.moveTo(x0 + rnd() * 3, H); ctx.lineTo(x0 + H * 0.5 + rnd() * 3, y0 + (x0 / W) * H * 0.1); ctx.stroke(); }
-    ctx.restore();
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = INK;
-    path(); ctx.lineWidth = Math.max(2, W * 0.011); ctx.stroke();
-    ctx.save(); ctx.translate(rnd() * W * 0.006, rnd() * W * 0.006); path(); ctx.globalAlpha = 0.35; ctx.lineWidth = Math.max(1, W * 0.004); ctx.stroke(); ctx.restore();
-    var f = face(L), bl = reduce ? 1 : blink(st, t);
-    ctx.fillStyle = INK;
-    [-1, 1].forEach(function (sx) { ctx.beginPath(); ctx.ellipse((f[0] + sx * 0.072 + rnd() * 0.003) * W, (f[1] + rnd() * 0.003) * H, 0.017 * W, 0.021 * W * bl, rnd() * 0.3, 0, Math.PI * 2); ctx.fill(); });
-    ctx.lineWidth = Math.max(1.6, W * 0.008); ctx.beginPath(); ctx.moveTo((f[0] - 0.024) * W, (f[1] + 0.03) * H); ctx.quadraticCurveTo((f[0] + rnd() * 0.004) * W, (f[1] + 0.058) * H, (f[0] + 0.024) * W, (f[1] + 0.03) * H); ctx.stroke();
-    ctx.strokeStyle = BLUSH; ctx.lineWidth = Math.max(1, W * 0.004); ctx.globalAlpha = 0.8;
-    [-1, 1].forEach(function (sx) { for (var k = 0; k < 3; k++) { var bx = (f[0] + sx * 0.108 + k * 0.012 - 0.012) * W, by = (f[1] + 0.04) * H; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - W * 0.008, by + W * 0.012); ctx.stroke(); } });
-    ctx.globalAlpha = 1;
+  function extend(a, b) { var o = {}, k; for (k in a) if (a.hasOwnProperty(k)) o[k] = a[k]; if (b) for (k in b) if (b.hasOwnProperty(k)) o[k] = b[k]; return o; }
+
+  // 決定的な乱数（-0.5〜0.5）。seed・コマ番号・部品ごとに別の列
+  function rng(seed, frame, id) {
+    var s = ((seed | 0) * 73856093 ^ (frame | 0) * 19349663 ^ (id | 0) * 83492791) >>> 0;
+    s = s % 233280;
+    return function () { s = (s * 9301 + 49297) % 233280; return s / 233280 - 0.5; };
   }
-  var t0 = performance.now() / 1000, all = [];
-  Array.prototype.forEach.call(cs, function (c) {
-    var st = { c: c, pokeAt: -1, px: 0.5, py: 0.55, nb: 1.5 + Math.random() * 2, ba: -9, on: true };
-    c.addEventListener('pointerdown', function (e) {
-      var r = c.getBoundingClientRect();
-      st.pokeAt = performance.now() / 1000 - t0; st.px = (e.clientX - r.left) / r.width; st.py = (e.clientY - r.top) / r.height;
-      if (reduce) { var n = 0; (function step() { draw(st, performance.now() / 1000 - t0); if (++n < 12) setTimeout(step, 100); })(); }
+
+  // ------------------------------------------------------------------ 形（距離の関数）
+  function sdRRect(cx, cy, w, h, r, rot) {
+    var c = Math.cos(-rot || 0), s = Math.sin(-rot || 0);
+    return function (x, y) {
+      var dx = x - cx, dy = y - cy;
+      if (rot) { var tx = dx * c - dy * s; dy = dx * s + dy * c; dx = tx; }
+      var qx = Math.abs(dx) - w / 2 + r, qy = Math.abs(dy) - h / 2 + r;
+      return Math.sqrt(Math.pow(Math.max(qx, 0), 2) + Math.pow(Math.max(qy, 0), 2)) + Math.min(Math.max(qx, qy), 0) - r;
+    };
+  }
+  // 体の枠: 角丸長方形の下辺と左右をわずかにふくらませる
+  function sdFrame(w, h, r, soft) {
+    var base = sdRRect(0, 0, w, h, r, 0);
+    return function (x, y) {
+      var u = x / (w / 2), v = y / (h / 2);
+      var bulge = soft * (0.018 * w * Math.max(0, v) * (1 - u * u * 0.6) + 0.010 * w * Math.cos(u * 1.6) * (1 - Math.abs(v)));
+      return base(x, y) - bulge;
+    };
+  }
+  function sdEgg(w, h) {
+    return function (x, y) {
+      var v = y / (h / 2), rx = Math.max(0.01, w / 2 * (1 + 0.14 * v));
+      return (Math.sqrt(x * x / (rx * rx) + y * y / (h * h / 4)) - 1) * Math.min(rx, h / 2);
+    };
+  }
+  // 中心から等角度の光線で輪郭を拾い、点をゆらす
+  function outline(sd, cx, cy, n, rnd, jit) {
+    var pts = [];
+    for (var i = 0; i < n; i++) {
+      var a = i / n * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a), lo = 0, hi = 0.01;
+      while (hi < 3 && sd(cx + ca * hi, cy + sa * hi) < 0) { lo = hi; hi += 0.01; }
+      for (var k = 0; k < 12; k++) { var mid = (lo + hi) / 2; if (sd(cx + ca * mid, cy + sa * mid) < 0) lo = mid; else hi = mid; }
+      var r = (lo + hi) / 2;
+      pts.push([cx + ca * r + (jit ? rnd() * jit : 0), cy + sa * r + (jit ? rnd() * jit : 0)]);
+    }
+    return pts;
+  }
+  function trace(ctx, pts) {
+    var n = pts.length; ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var p = pts[i % n], q = pts[(i + 1) % n], mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+      if (i === 0) ctx.moveTo(mx, my); else ctx.quadraticCurveTo(p[0], p[1], mx, my);
+    }
+    ctx.closePath();
+  }
+  function frameEdge(sd, dir) { var y = 0; while (sd(0, y) < 0 && Math.abs(y) < 2) y += 0.0005 * dir; return y; }
+  function rrPath(ctx, x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  }
+
+  // ------------------------------------------------------------------ 手足
+  function limb(ax, ay, deg, len) { return { a: [ax, ay], ang: deg * D, len: len }; }
+  function limbCenter(L, th) {
+    if (L.c) return L.c;
+    var d = L.len / 2 - th * S.embed;
+    return [L.a[0] + Math.cos(L.ang) * d, L.a[1] + Math.sin(L.ang) * d];
+  }
+  function limbTip(L, th) { var c = limbCenter(L, th); return [c[0] + Math.cos(L.ang) * L.len / 2, c[1] + Math.sin(L.ang) * L.len / 2]; }
+
+  // ポーズ: 手足のカプセルの向きだけを変える。g = 体の寸法、d = 標準の手足
+  var POSES = {
+    stand: function () { return {}; },
+    wave: function (g, d) {
+      var rh = limb(g.hw - 0.04, -0.054, -52, d.arm);
+      var tip = limbTip(rh, d.th);
+      return {
+        limbs: { rh: rh, lh: limb(-(g.hw - 0.04), 0.07, 118, d.arm - 0.018) },
+        lines: [{ col: C.ink, a: 0.55, lw: 0.0065, segs: [
+          [tip[0] + 0.054, tip[1] - 0.09, tip[0] + 0.125, tip[1] - 0.036, tip[0] + 0.134, tip[1] + 0.054],
+          [tip[0] + 0.098, tip[1] - 0.134, tip[0] + 0.1875, tip[1] - 0.0625, tip[0] + 0.196, tip[1] + 0.045]] }]
+      };
+    },
+    push: function (g, d) {
+      var lh = limb(g.hw - 0.107, -0.07, -6, d.arm + 0.09);
+      var rh = limb(g.hw - 0.04, 0.09, 3, d.arm);
+      var t1 = limbTip(rh, d.th), t2 = limbTip(lh, d.th), cx = Math.max(t1[0], t2[0]) + 0.118, x = -g.hw - 0.054;
+      return {
+        limbs: { lh: lh, rh: rh, lf: limb(-d.lx, g.fb - 0.45 * d.th, 112, d.leg + 0.018), rf: limb(d.lx, g.fb - 0.45 * d.th, 84, d.leg) },
+        look: [0.03, -0.004], lean: 0.07,
+        props: [{ kind: 'card', cx: cx, cy: 0.0, w: 0.232, h: 0.446, r: 0.036, rot: -0.07 }],
+        lines: [{ col: C.ink, a: 0.45, lw: 0.0065, segs: [[x - 0.125, -0.054, x - 0.036, -0.054], [x - 0.16, 0.036, x - 0.054, 0.036], [x - 0.107, 0.125, x - 0.036, 0.125]] }]
+      };
+    },
+    shoot: function (g, d) {
+      var rh = limb(g.hw - 0.04, 0.054, -38, d.arm);
+      var lh = limb(g.hw - 0.125, -0.125, -22, d.arm + 0.07);
+      var tip = limbTip(rh, d.th), px = tip[0] + 0.08, py = tip[1] - 0.071, hy = g.ft - 0.05;
+      return {
+        limbs: { rh: rh, lh: lh }, look: [0.028, -0.01],
+        props: [{ kind: 'phone', cx: px, cy: py, w: 0.286, h: 0.152, r: 0.032, rot: -0.14 }],
+        lines: [{ col: C.amber, a: 0.9, lw: 0.009, segs: [[-0.125, hy - 0.036, -0.17, hy - 0.0625], [0, hy - 0.07, 0, hy - 0.115], [0.125, hy - 0.036, 0.17, hy - 0.0625]] }]
+      };
+    },
+    point: function (g, d) {
+      var rh = limb(g.hw - 0.04, -0.01, -14, d.arm + 0.054);
+      var tip = limbTip(rh, d.th), sx = tip[0] + 0.134, sy = tip[1] - 0.054, segs = [];
+      for (var i = 0; i < 4; i++) { var a = i * Math.PI / 2 + 0.3; segs.push([sx + Math.cos(a) * 0.021, sy + Math.sin(a) * 0.021, sx + Math.cos(a) * 0.0625, sy + Math.sin(a) * 0.0625]); }
+      return {
+        limbs: { rh: rh, lh: limb(-(g.hw - 0.04), 0.07, 115, d.arm) }, look: [0.03, 0],
+        lines: [{ col: C.amber, a: 1, lw: 0.0107, segs: segs }, { col: C.ink, a: 0.35, lw: 0.0065, segs: [[tip[0] + 0.027, tip[1] - 0.007, sx - 0.054, sy + 0.018]] }]
+      };
+    }
+  };
+
+  // ------------------------------------------------------------------ opts
+  function norm(o) {
+    o = o || {};
+    var n = {
+      x: +o.x || 0, y: +o.y || 0, size: o.size > 0 ? +o.size : 200, t: +o.t || 0,
+      stage: S.stage[o.stage] ? o.stage : 'adult', face: S.face[o.face] ? o.face : 'base',
+      blink: clamp01(+o.blink || 0), pose: POSES[o.pose] ? o.pose : 'stand',
+      squash: Math.max(-1, Math.min(1, +o.squash || 0)), lean: o.lean,
+      iconMorph: clamp01(+o.iconMorph || 0), seed: o.seed == null ? 7 : (o.seed | 0),
+      small: o.small, props: o.props !== false, shadow: o.shadow !== false
+    };
+    if (n.small == null) n.small = n.size < 48;
+    if (n.iconMorph > 0) { n.stage = 'adult'; n.small = false; }
+    return n;
+  }
+
+  // ------------------------------------------------------------------ 組み立て（体の中心 = 原点、y は下向き）
+  function build(o) {
+    var small = o.small, st = S.stage[o.stage], m = o.iconMorph, sm = S.small;
+    var p1 = ease(m / 0.45), p2 = ease((m - 0.45) / 0.2), p3 = ease((m - 0.6) / 0.4);
+    var jitK = 1 - 0.65 * p3;
+    var th = S.th * (small ? sm.th : 1);
+    var pieces = [], g = { hw: st.w / 2 };
+
+    if (o.stage === 'egg') {
+      var eg = sdEgg(st.w, st.h); g.fb = frameEdge(eg, 1); g.ft = frameEdge(eg, -1);
+      var sth = S.th * (small ? sm.th * 0.95 : 1.1), stand = { kind: 'cap', sd: sdRRect(0, g.fb - sth * 0.1, st.w * 0.78, sth, sth / 2, 0), cx: 0, cy: g.fb - sth * 0.1, col: C.amber };
+      var ww0 = st.w * 0.62, wh0 = st.h * 0.3;
+      pieces.push({ kind: 'body', sd: eg, cx: 0, cy: 0, fill: C.body, hatch: true, hatchFrom: st.h * 0.2, specks: true, dotWin: [ww0, wh0, -0.021] });
+      pieces.push(stand);
+      return { pieces: pieces, face: null, ground: g.fb - sth * 0.1 + sth / 2, shadowW: st.w * 0.85, shadowA: 1, lines: [], lean: 0, jitK: 1 };
+    }
+
+    // 枠（アイコンへ近づくと 16:9 の角丸長方形へ）
+    var I = S.icon, iw = 1, ih = I.frame[3] / I.frame[2], ir = I.frame[4] / I.frame[2];
+    // アイコンに重なるよう、最後は線の太さの半分だけ内側へ（線の外側がアイコンの縁になる）
+    var inset = S.line * p3;
+    var w = st.w - inset, h = lerp(st.h, ih, p3) - inset, r = lerp(st.r, ir, p3), soft = S.soft * (1 - p3);
+    var sd = sdFrame(w, h, r, soft);
+    g.fb = frameEdge(sd, 1); g.ft = frameEdge(sd, -1); g.hw = w / 2;
+
+    var d = { th: th, leg: S.leg * st.legK * (small ? sm.leg : 1), arm: S.arm * (small ? sm.arm : 1), lx: w * st.legX };
+    var L = {
+      lf: limb(-d.lx, g.fb - th * 0.45, 90, d.leg),
+      rf: limb(d.lx, g.fb - th * 0.45, 90, d.leg)
+    };
+    var hth = th * S.headTh, hlen = S.head * (small ? sm.head : 1);
+    L.hd = { c: [0, g.ft - hth * 0.5 + (small ? 0.021 : 0.007)], len: hlen, ang: 0, th: hth, front: true };
+    if (o.stage === 'adult') {
+      L.lh = limb(-(g.hw - S.armX), S.armY, 138, d.arm);
+      L.rh = limb(g.hw - S.armX, S.armY, 42, d.arm);
+    }
+    var P = POSES[o.pose](g, d), k;
+    if (P.limbs) for (k in P.limbs) if (L[k] || o.stage === 'adult') L[k] = P.limbs[k];
+    if (o.stage !== 'adult') { delete L.lh; delete L.rh; }
+
+    var standGround = g.fb + d.leg - th * (S.embed + 0.45);
+    var ground = standGround;
+
+    // アイコンになる: 手足と頭が外れて枠の下へ撮った順に並び、手の2つがつながる
+    if (m > 0) {
+      var iconFb = ih / 2, bandCy = iconFb + (I.bandY - (I.frame[1] + I.frame[3])) / I.frame[2] + I.bandH / I.frame[2] / 2;
+      var bthI = I.bandH / I.frame[2], bth5 = 0.08;
+      ground = lerp(standGround, bandCy + bthI / 2, p1);
+      var X = function (ix) { return (ix - 512) / I.frame[2]; };
+      var tgt4 = { lf: I.segs4[0], rf: I.segs4[1], lh: I.segs4[2], rh: I.segs4[2], hd: I.segs4[3] };
+      ORDER.forEach(function (name, i) {
+        var Lm = L[name]; if (!Lm) return;
+        var t0 = Lm.th || th, c0 = limbCenter(Lm, t0), s5 = I.segs5[i], s4 = tgt4[name];
+        var q = ease((m / 0.45 - i * 0.1) / 0.6);
+        var c5 = [(X(s5[0]) + X(s5[1])) / 2, bandCy], len5 = X(s5[1]) - X(s5[0]);
+        var c4 = [(X(s4[0]) + X(s4[1])) / 2, bandCy], len4 = X(s4[1]) - X(s4[0]) - S.line * 0.8 * p3;
+        var da = -Lm.ang; da = da - Math.round(da / Math.PI) * Math.PI;   // カプセルは180°で同じ形
+        var cx = lerp(lerp(c0[0], c5[0], q), c4[0], p2), cy = lerp(c0[1], c5[1], q) - 0.12 * Math.sin(Math.PI * q);
+        L[name] = {
+          c: [cx, cy], ang: Lm.ang + da * q, len: lerp(lerp(Lm.len, len5, q), len4, p2),
+          th: lerp(lerp(t0, bth5, q), bthI, p2) - S.line * 0.8 * p3, front: true,
+          col: name === 'hd' ? C.amber : mix(PART_COL[name], C.ink, p3),
+          stroke: name === 'hd' ? mix(C.ink, C.amber, p3) : null   // アイコンの琥珀の区画には墨の縁がない
+        };
+      });
+      if (p2 >= 1) delete L.lh;   // 手の2つは1本の区画に重なった
+    }
+
+    // 窓と顔
+    var bz = h * S.bezel, ww = w - bz * 2, wh = h - bz * 2;
+    var body = { kind: 'body', sd: sd, cx: 0, cy: 0, fill: mix(C.body, C.ink, p3), hatch: true, hatchFrom: h * S.hatchFrom, hatchA: clamp01(1 - p3 * 1.6) };
+    var win = { kind: 'win', sd: sdRRect(0, 0, ww, wh, Math.min(S.winR, wh * 0.3), 0), cx: 0, cy: 0, fill: mix(C.window, C.ink, p3), strokeA: 1 - p3, lw: 0.7, noBox: true };
+
+    var faceType = o.face;
+    if (m > 0.05) faceType = m < 0.45 ? 'open' : 'happy';
+    var face = {
+      type: faceType, F: st.face, blink: o.blink, look: P.look || [0, 0],
+      alpha: 1 - ease((m - 0.6) / 0.2)
+    };
+
+    var behind = [], front = [];
+    ORDER.forEach(function (name) {
+      var Lm = L[name]; if (!Lm) return;
+      var t0 = Lm.th || th, c = limbCenter(Lm, t0);
+      var pc = { kind: 'cap', sd: sdRRect(c[0], c[1], Lm.len, t0, t0 / 2, Lm.ang), cx: c[0], cy: c[1], col: Lm.col || PART_COL[name], stroke: Lm.stroke, lw: 0.8 };
+      (Lm.front ? front : behind).push(pc);
     });
-    all.push(st); draw(st, 0);
-  });
-  if (reduce) return;
-  if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { all.forEach(function (s) { if (s.c === e.target) s.on = e.isIntersecting; }); }); }); all.forEach(function (s) { io.observe(s.c); }); }
-  var last = -1;
-  (function loop() {
-    var t = performance.now() / 1000 - t0, fr = Math.floor(t * 20);
-    if (fr !== last && !document.hidden) { last = fr; all.forEach(function (s) { if (s.on) draw(s, t); }); }
-    requestAnimationFrame(loop);
-  })();
-})();
+    var props = [];
+    if (o.props && P.props && m === 0) P.props.forEach(function (pr) {
+      props.push({ kind: pr.kind, sd: sdRRect(pr.cx, pr.cy, pr.w, pr.h, pr.r, pr.rot), cx: pr.cx, cy: pr.cy, fill: pr.kind === 'phone' ? C.ink : C.window, lw: 0.8, prop: pr });
+    });
+    pieces = behind.concat([body, win], front, props);
+    return {
+      pieces: pieces, face: face, ground: ground, shadowW: w * S.shadowW, shadowA: 1 - p3,
+      lines: m === 0 && !small ? (P.lines || []) : [], lean: P.lean || 0, jitK: jitK, win: { w: ww, h: wh }
+    };
+  }
+
+  // ------------------------------------------------------------------ 描く
+  function lwPx(v, U, minPx) { return Math.max(v, minPx * U); }
+
+  function drawPiece(ctx, p, pts, rnd, U, o, gb) {
+    var small = o.small;
+    ctx.save();
+    if (p.strokeA != null && p.strokeA <= 0 && p.kind === 'win' && p.fill === C.ink) { ctx.restore(); return; }
+    trace(ctx, pts); ctx.fillStyle = p.fill || p.col; ctx.fill();
+
+    if (p.specks && !small) {
+      ctx.save(); trace(ctx, pts); ctx.clip(); ctx.fillStyle = C.hatch; ctx.globalAlpha = 0.35;
+      [[-0.09, -0.04, 0.02], [0.09, 0.05, 0.016], [-0.036, 0.125, 0.014], [0.107, -0.125, 0.0125], [-0.125, -0.16, 0.011]].forEach(function (s) {
+        ctx.beginPath(); ctx.ellipse(s[0], s[1], s[2], s[2] * 0.7, 0.5, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+    }
+    var hA = p.hatchA == null ? 1 : p.hatchA;
+    if (p.hatch && !small && hA > 0) {
+      ctx.save(); trace(ctx, pts); ctx.clip();
+      ctx.strokeStyle = C.hatch; ctx.globalAlpha = S.hatchA * hA; ctx.lineCap = 'round';
+      ctx.lineWidth = lwPx(S.hatchLw, U, 1);
+      var step = S.hatchStep * (o.size < 140 ? 1.4 : 1), dx = S.hatchDir[0], dy = S.hatchDir[1];
+      for (var x0 = -1.2; x0 < 1.2; x0 += step) {
+        var ex = x0 + 0.45, ey = p.hatchFrom + ex * 0.08, l = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(ex - dx * l + rnd() * 0.004, ey - dy * l);
+        ctx.lineTo(ex + rnd() * 0.004, ey + rnd() * 0.004);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    var sA = p.strokeA == null ? 1 : p.strokeA;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    if (small) {
+      // 32px: カプセルは自分の色を濃くした細線、窓は薄い線、体だけ墨
+      if (p.kind === 'cap') { ctx.strokeStyle = mix(p.col.charAt(0) === '#' ? p.col : C.amber, C.ink, 0.6); ctx.lineWidth = 1 * U; }
+      else if (p.kind === 'win') { ctx.strokeStyle = mix(C.body, C.ink, 0.45); ctx.lineWidth = S.small.line * 0.75 * U; }
+      else { ctx.strokeStyle = C.ink; ctx.lineWidth = Math.max(S.small.line * U, S.line * 1.2); }
+      if (sA > 0) { ctx.globalAlpha = sA; trace(ctx, pts); ctx.stroke(); }
+    } else if (sA > 0) {
+      ctx.globalAlpha = sA; ctx.strokeStyle = p.stroke || C.ink;
+      trace(ctx, pts); ctx.lineWidth = lwPx(S.line * (p.lw || 1), U, 2 * (p.lw || 1)); ctx.stroke();
+      ctx.save(); ctx.translate(rnd() * S.faintOff, rnd() * S.faintOff); trace(ctx, pts);
+      ctx.globalAlpha = 0.35 * sA; ctx.lineWidth = lwPx(S.faint, U, 1); ctx.stroke(); ctx.restore();
+    }
+    if (p.dotWin && !small) {
+      var dw = p.dotWin; ctx.strokeStyle = C.ink; ctx.globalAlpha = 0.32; ctx.lineWidth = lwPx(S.faint, U, 1);
+      ctx.setLineDash([0.021, 0.018]); rrPath(ctx, -dw[0] / 2, dw[2] - dw[1] / 2, dw[0], dw[1], 0.045); ctx.stroke(); ctx.setLineDash([]);
+    }
+    if (p.prop && !small) drawPropDetail(ctx, p.prop, U);
+    ctx.restore();
+  }
+
+  function drawPropDetail(ctx, pr, U) {
+    ctx.save(); ctx.translate(pr.cx, pr.cy); ctx.rotate(pr.rot);
+    if (pr.kind === 'card') {
+      // カードの中身: 文字の線3本と帯の色3つ
+      ctx.strokeStyle = C.ink; ctx.globalAlpha = 0.55; ctx.lineWidth = lwPx(0.0085, U, 1); ctx.lineCap = 'round';
+      [[-0.125, 0.07], [-0.07, 0.035], [-0.018, 0.045]].forEach(function (l) { ctx.beginPath(); ctx.moveTo(-0.0625, l[0]); ctx.lineTo(-0.0625 + 0.07 + l[1], l[0]); ctx.stroke(); });
+      ctx.globalAlpha = 1;
+      [[-0.071, 0.021, C.sky], [-0.043, 0.039, C.leaf], [0.004, 0.032, C.amber]].forEach(function (b) { ctx.fillStyle = b[2]; rrPath(ctx, b[0], 0.125, b[1], 0.021, 0.0105); ctx.fill(); });
+    } else if (pr.kind === 'phone') {
+      ctx.fillStyle = C.lens;
+      ctx.beginPath(); ctx.arc(-0.089, -0.032, 0.023, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(-0.089, 0.029, 0.016, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawFace(ctx, f, win, U, small, rnd) {
+    if (f.alpha <= 0) return;
+    var T = S.face[f.type], F = f.F, x = f.look[0] * F, y = (S.faceY + T.dy + f.look[1]) * F, ex = T.sep * F;
+    ctx.save(); ctx.globalAlpha = f.alpha; ctx.fillStyle = C.ink; ctx.strokeStyle = C.ink; ctx.lineCap = 'round';
+    var open = 1 - f.blink;
+    [-1, 1].forEach(function (sx) {
+      var ex0 = x + sx * ex + rnd() * 0.002 * F, ey0 = y + rnd() * 0.002 * F;
+      if (T.eye === 'arc') {
+        var R = small ? Math.max(0.02 * F, 2.3 * U) : 0.022 * F;
+        ctx.lineWidth = small ? 1.25 * U : lwPx(0.009 * F, U, 1.6);
+        ctx.beginPath(); ctx.arc(ex0, ey0 + R * 0.75, R, Math.PI * 1.13, Math.PI * 1.87); ctx.stroke();
+        return;
+      }
+      var erx = S.eyeRx * F, ery = S.eyeRy * F;
+      if (small) { erx = Math.max(erx, 1.25 * U); ery = Math.max(ery, 1.55 * U); }
+      if (open < 0.15) {
+        // まばたき: 閉じた目は短い横線
+        ctx.lineWidth = small ? 1.1 * U : lwPx(0.008 * F, U, 1.6);
+        ctx.beginPath(); ctx.moveTo(ex0 - erx * 1.15, ey0 + ery * 0.2); ctx.lineTo(ex0 + erx * 1.15, ey0 + ery * 0.2); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.ellipse(ex0, ey0 + ery * (1 - open) * 0.2, erx, ery * open, rnd() * 0.2, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+    var my = y + S.mouthY * F;
+    if (T.mouth === 'D') {
+      var rx = small ? Math.max(0.024 * F, 1.7 * U) : 0.024 * F, ry = small ? Math.max(0.024 * F, 1.6 * U) : 0.026 * F;
+      ctx.beginPath(); ctx.moveTo(x - rx, my); ctx.ellipse(x, my, rx, ry, 0, Math.PI, 0, true); ctx.closePath(); ctx.fill();
+      if (!small) { ctx.save(); ctx.clip(); ctx.fillStyle = C.blush; ctx.globalAlpha = 0.85 * f.alpha; ctx.beginPath(); ctx.ellipse(x, my + ry * 0.95, rx * 0.6, ry * 0.45, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+    } else {
+      var mw = T.mw * F;
+      ctx.lineWidth = small ? Math.max(1.1 * U, 0.008 * F) : lwPx(0.008 * F, U, 1.6);
+      ctx.beginPath(); ctx.moveTo(x - mw, my); ctx.quadraticCurveTo(x + rnd() * 0.003 * F, y + (S.mouthY + T.mw * 1.15) * F, x + mw, my); ctx.stroke();
+    }
+    // 頬: 短い斜線3本（32pxでは1本の横線）
+    var bxo = ex + S.blushX * F, by = y + S.blushY * F;
+    ctx.strokeStyle = C.blush;
+    [-1, 1].forEach(function (sx) {
+      var bx = x * 0.5 + sx * bxo;
+      if (small) { ctx.globalAlpha = 0.9 * f.alpha; ctx.lineWidth = 1.1 * U; ctx.beginPath(); ctx.moveTo(bx - 1.2 * U, by); ctx.lineTo(bx + 1.2 * U, by); ctx.stroke(); return; }
+      ctx.globalAlpha = 0.8 * f.alpha; ctx.lineWidth = lwPx(0.004 * F, U, 1);
+      for (var k = 0; k < 3; k++) { var hx = bx + (k * 0.012 - 0.012) * F; ctx.beginPath(); ctx.moveTo(hx, by); ctx.lineTo(hx - 0.008 * F, by + 0.012 * F); ctx.stroke(); }
+    });
+    ctx.restore();
+  }
+
+  function drawLines(ctx, L, U) {
+    ctx.save(); ctx.strokeStyle = L.col; ctx.globalAlpha = L.a; ctx.lineWidth = lwPx(L.lw, U, 1); ctx.lineCap = 'round';
+    L.segs.forEach(function (s) { ctx.beginPath(); ctx.moveTo(s[0], s[1]); if (s.length === 6) ctx.quadraticCurveTo(s[2], s[3], s[4], s[5]); else ctx.lineTo(s[2], s[3]); ctx.stroke(); });
+    ctx.restore();
+  }
+
+  function pieceN(p, small) {
+    if (p.kind === 'cap') return small ? S.ptsCapSmall : S.ptsCap;
+    return small ? S.ptsSmall : S.ptsBody;
+  }
+  function pieceJit(p) { return p.kind === 'cap' ? S.jitCap : S.jitBody; }
+
+  function draw(ctx, opts) {
+    var o = norm(opts), g = build(o), k = o.size, U = 1 / k, fr = Math.floor(o.t * S.fps + 1e-6);
+    var lean = o.lean == null ? g.lean : +o.lean;
+    var sx = 1 + S.squashX * o.squash, sy = 1 - S.squashY * o.squash;
+    ctx.save();
+    ctx.translate(o.x, o.y);
+    // 床の落書きの楕円（傾けない）
+    if (o.shadow && g.shadowA > 0) {
+      var rs = rng(o.seed, fr, 900);
+      ctx.save(); ctx.scale(k * sx, k); ctx.strokeStyle = C.ink; ctx.globalAlpha = S.shadowA * g.shadowA;
+      ctx.lineWidth = lwPx(S.faint, U, 1);
+      var rings = o.small ? 1 : S.shadowRx.length;
+      for (var i = 0; i < rings; i++) {
+        ctx.beginPath(); ctx.ellipse(rs() * 0.018, 0.012 + i * S.shadowDy, g.shadowW * S.shadowRx[i], S.shadowRy, 0, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    ctx.rotate(lean);
+    ctx.scale(k * sx, k * sy);
+    ctx.translate(0, -g.ground);
+    g.pieces.forEach(function (p, i) {
+      var rnd = rng(o.seed, fr, i + 1);
+      var pts = outline(p.sd, p.cx, p.cy, pieceN(p, o.small), rnd, pieceJit(p) * g.jitK);
+      drawPiece(ctx, p, pts, rnd, U, o, g);
+    });
+    if (g.face) drawFace(ctx, g.face, g.win, U, o.small, rng(o.seed, fr, 500));
+    g.lines.forEach(function (L) { drawLines(ctx, L, U); });
+    ctx.restore();
+  }
+
+  // 描く範囲（ゆれを除いた輪郭と床の楕円）。x, y からの px
+  function measure(opts) {
+    var o = norm(opts), g = build(o), k = o.size;
+    var lean = o.lean == null ? g.lean : +o.lean, c = Math.cos(lean), s = Math.sin(lean);
+    var sx = 1 + S.squashX * o.squash, sy = 1 - S.squashY * o.squash;
+    var b = { left: 1e9, right: -1e9, top: 1e9, bottom: -1e9 };
+    function add(px, py) { b.left = Math.min(b.left, px); b.right = Math.max(b.right, px); b.top = Math.min(b.top, py); b.bottom = Math.max(b.bottom, py); }
+    g.pieces.forEach(function (p) {
+      outline(p.sd, p.cx, p.cy, 48, null, 0).forEach(function (q) {
+        var X = q[0] * k * sx, Y = (q[1] - g.ground) * k * sy;
+        add(o.x + X * c - Y * s, o.y + X * s + Y * c);
+      });
+    });
+    if (o.shadow && g.shadowA > 0) { var rx = g.shadowW * S.shadowRx[0] * k * sx; add(o.x - rx, o.y + (0.012 + 3 * S.shadowDy + S.shadowRy) * k); add(o.x + rx, o.y); }
+    b.left -= o.x; b.right -= o.x; b.top -= o.y; b.bottom -= o.y;
+    return b;
+  }
+
+  // 寸法（体の幅 = 1、体の中心が原点、y は下向き）。アプリへ移すときの確認用
+  function geometry(opts) {
+    var o = norm(opts), g = build(o), st = S.stage[o.stage];
+    return { stage: o.stage, bodyW: st.w, bodyH: st.h, ground: g.ground, win: g.win || null, face: g.face ? g.face.F : 0, th: S.th * (o.small ? S.small.th : 1) };
+  }
+
+  // ------------------------------------------------------------------ サイト用
+  function now() { return (root.performance && performance.now ? performance.now() : Date.now()) / 1000; }
+  function pokeCurve(pokeAt, t) {
+    if (pokeAt < 0) return 0; var d = t - pokeAt;
+    if (d < 0) return 0; if (d < 0.12) return d / 0.12;
+    var q = d - 0.12; return q > 1.2 ? 0 : Math.exp(-q * 7.5) * Math.cos(q * 13);
+  }
+
+  // 動画用: 決定的なまばたき（seed ごとに 2.6〜5.4 秒おき、0.14 秒で閉じて開く）。0=開き 1=閉じ
+  function blinkAt(t, seed) {
+    var at = 1.2 + (((seed | 0) * 7 % 10) / 10) * 1.5, i = 0;
+    while (at + 0.14 < t && i < 100000) { var r = rng(seed == null ? 7 : seed, i, 777)(); at += 2.6 + (r + 0.5) * 2.8; i++; }
+    var d = t - at; return (d >= 0 && d < 0.14) ? 1 - Math.max(0.08, Math.abs(d - 0.07) / 0.07) : 0;
+  }
+  // 押してから dt 秒の潰れ（squash に渡す値）。0.12 秒で潰れ、減衰しながら戻る
+  function squashAt(dt) { return dt < 0 ? 0 : pokeCurve(0, dt); }
+
+  function mount(canvas, opts) {
+    opts = opts || {};
+    var reduce = !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var ctx = canvas.getContext('2d'), t0 = now(), st = { pokeAt: -1, nb: 1.5 + Math.random() * 2, ba: -9, on: true, dead: false, raf: 0 };
+    var base = extend(opts), place = null;
+    function fit() {
+      var W = canvas.width, H = canvas.height, pad = opts.pad == null ? 0.08 : opts.pad;
+      var b = measure(extend(base, { x: 0, y: 0, size: 1, squash: 0, small: false }));
+      var size = Math.min(W * (1 - 2 * pad) / (b.right - b.left), H * (1 - 2 * pad) / (b.bottom - b.top));
+      var sm = base.small == null ? size < 48 : base.small;
+      if (sm) { b = measure(extend(base, { x: 0, y: 0, size: 1, squash: 0, small: true })); size = Math.min(W * (1 - 2 * pad) / (b.right - b.left), H * (1 - 2 * pad) / (b.bottom - b.top)); }
+      place = { size: size, small: sm, x: W / 2 - (b.left + b.right) / 2 * size, y: H / 2 - (b.top + b.bottom) / 2 * size };
+    }
+    function blinkAt(t) {
+      if (reduce) return 0;
+      if (t > st.nb) { st.ba = t; st.nb = t + 2.6 + Math.random() * 2.8; }
+      var d = t - st.ba; return (d >= 0 && d < 0.14) ? 1 - Math.max(0.08, Math.abs(d - 0.07) / 0.07) : 0;
+    }
+    function render(t) {
+      if (!place) fit();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      draw(ctx, extend(base, { x: place.x, y: place.y, size: place.size, small: place.small, t: reduce ? 0 : t, blink: blinkAt(t), squash: pokeCurve(st.pokeAt, t) }));
+    }
+    function onDown() {
+      st.pokeAt = now() - t0;
+      if (reduce) { var n = 0; (function step() { render(now() - t0); if (++n < 12) setTimeout(step, 100); })(); }
+    }
+    canvas.addEventListener('pointerdown', onDown);
+    render(0);
+    var io = null;
+    if (!reduce) {
+      if ('IntersectionObserver' in root) { io = new IntersectionObserver(function (es) { es.forEach(function (e) { st.on = e.isIntersecting; }); }); io.observe(canvas); }
+      var last = -1;
+      (function loop() {
+        if (st.dead) return;
+        var t = now() - t0, fr = Math.floor(t * 20);
+        if (fr !== last && st.on && !document.hidden) { last = fr; render(t); }
+        st.raf = requestAnimationFrame(loop);
+      })();
+    }
+    return {
+      update: function (o2) { base = extend(base, o2); place = null; render(now() - t0); },
+      poke: onDown,
+      destroy: function () { st.dead = true; if (st.raf) cancelAnimationFrame(st.raf); if (io) io.disconnect(); canvas.removeEventListener('pointerdown', onDown); }
+    };
+  }
+
+  function mountAll(selector, opts) {
+    var cs = document.querySelectorAll(selector || 'canvas.torun'), out = [];
+    Array.prototype.forEach.call(cs, function (c) {
+      var o = extend(opts, {});
+      if (c.getAttribute('data-stage')) o.stage = c.getAttribute('data-stage');
+      if (c.getAttribute('data-face')) o.face = c.getAttribute('data-face');
+      if (c.getAttribute('data-pose')) o.pose = c.getAttribute('data-pose');
+      if (c.getAttribute('data-seed')) o.seed = +c.getAttribute('data-seed');
+      out.push(mount(c, o));
+    });
+    return out;
+  }
+
+  root.Torun = { version: '1.0.0', draw: draw, measure: measure, geometry: geometry, mount: mount, mountAll: mountAll, blinkAt: blinkAt, squashAt: squashAt, spec: S, colors: C, poses: ['stand', 'wave', 'push', 'shoot', 'point'], faces: ['base', 'wide', 'happy', 'open'], stages: ['egg', 'child', 'adult'] };
+})(typeof window !== 'undefined' ? window : this);
+Torun.mountAll('canvas.torun');
 </script>
 </body>
 </html>
