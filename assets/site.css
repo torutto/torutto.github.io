@@ -48,7 +48,7 @@
   --gutter: 16px;
   --wrap: 1200px;
   --narrow: 42rem;
-  --section: clamp(72px, 10vw, 140px);
+  --section: clamp(56px, 10vw, 140px);
 }
 @media (min-width: 720px) {
   :root { --gutter: 48px; }
@@ -349,6 +349,8 @@ figcaption {
   margin-inline: auto;
 }
 .reel .media { aspect-ratio: 16 / 9; }
+/* 幅の狭い画面で縦長（4:5）の版に差し替えたとき（build.mjs の reelVideo） */
+.reel .media.portrait { aspect-ratio: 4 / 5; }
 .reel .video-controls { margin-top: 8px; }
 .opening-text { margin-top: clamp(28px, 4vw, 56px); }
 .opening h1 {
@@ -375,24 +377,24 @@ figcaption {
 
 .concern-list {
   max-width: 36em;
-  margin: 40px 0 0;
+  margin: clamp(24px, 4vw, 40px) 0 0;
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--rule);
 }
 .concern-list li {
-  padding: 20px 0;
+  padding: clamp(12px, 2vw, 20px) 0;
   border-bottom: 1px solid var(--rule);
 }
 .concern-answer {
   max-width: 36em;
-  margin-top: 40px;
+  margin-top: clamp(24px, 4vw, 40px);
   font-weight: 700;
 }
 
-/* ── トップ: 撮った順（ここだけ色の帯と大きな数字） ── */
+/* ── トップ: 撮る・ととのう・完成（ここだけ色の帯と大きな数字） ── */
 
-.order h2 { font-size: clamp(1.875rem, 1.125rem + 2.6vw, 3.75rem); line-height: 1.3; }
+.flow h2 { font-size: clamp(1.875rem, 1.125rem + 2.6vw, 3.75rem); line-height: 1.3; }
 .blocks {
   display: flex;
   gap: clamp(5px, 0.8vw, 10px);
@@ -441,9 +443,76 @@ figcaption {
   .blocks div:not(.btalk) small { margin: 6px 0 0; }
   .btalk b { margin-bottom: calc(0.75rem + 6px); } /* ほかの区画の数字と下をそろえる */
 }
-.order-body { margin-top: clamp(24px, 3vw, 40px); }
-.order-body p { max-width: 30em; }
-.order .motion { margin-top: clamp(48px, 6vw, 80px); }
+.section-lead { max-width: 34em; margin: 24px 0 0; }
+
+/* アプリの画面写真（縦）を3枚並べる。狭い画面でも3列のまま小さく */
+.screens {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 2.4vw, 32px);
+  max-width: 760px;
+  margin: clamp(40px, 5vw, 64px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.media.screen { border-radius: clamp(8px, 1.6vw, 18px); }
+.screens .media.screen { aspect-ratio: 9 / 19.5; }
+.screens .slot-file { display: none; }
+
+/* 完成した一本・Logのビフォーアフター */
+.finished .slot-figure { margin-top: clamp(32px, 4vw, 48px); }
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: clamp(32px, 4vw, 48px);
+}
+.compare figcaption { margin-top: 8px; font-size: 0.875rem; }
+/* 狭い画面では2つの枠の中の文が長さで割れないよう、比率ではなく中身で高さを決め、左右をそろえる */
+@media (max-width: 719px) {
+  .compare .motion { grid-template-rows: 1fr auto; }
+  .compare .slot { aspect-ratio: auto; height: 100%; min-height: 96px; }
+}
+@media (min-width: 720px) { .compare { gap: 32px; } }
+
+/* ── 仮の枠（build.mjs の SLOTS。素材を src/slots/ に置くと本物に替わる） ──
+   紙と墨のまま、破線と左上の小さな「仮」だけで仮だと分かるようにする */
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 32px clamp(10px, 3vw, 32px) 20px;
+  border: 1.5px dashed rgba(107, 96, 83, 0.5);
+  border-radius: var(--r);
+  color: var(--ink2);
+  text-align: center;
+}
+.slot-video { aspect-ratio: 16 / 9; }
+.slot-screen { aspect-ratio: 9 / 19.5; border-radius: clamp(8px, 1.6vw, 18px); }
+.slot-tag {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+}
+.slot p { margin: 0; max-width: 26em; }
+.slot-title { color: var(--ink); font-size: 0.9375rem; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+@media (min-width: 960px) { .finished .slot-title { font-size: 1.125rem; } .finished .slot-ask { font-size: 0.9375rem; } }
+.slot-title b { font-weight: 700; }
+.slot-ask { font-size: 0.8125rem; line-height: 1.6; }
+.slot-file { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.6875rem; letter-spacing: 0; opacity: 0.8; }
+@media (max-width: 719px) {
+  .slot { padding-inline: 8px; }
+  .slot-screen .slot-title, .compare .slot-title { font-size: 0.75rem; }
+  .slot-screen .slot-ask, .compare .slot-ask { font-size: 0.6875rem; line-height: 1.5; }
+  .slot-screen .slot-file, .compare .slot-file { display: none; }
+}
 
 /* ── トップ: 柱 ── */
 
@@ -455,20 +524,14 @@ figcaption {
 .pillar-body p { max-width: 30em; }
 .pillar-media { margin: 0; }
 
+.pillar .pillar-media { width: min(160px, 44%); }
 @media (min-width: 960px) {
   .pillar-grid {
-    grid-template-columns: 5fr 7fr;
+    grid-template-columns: 7fr 5fr;
     gap: 64px;
     align-items: center;
   }
-  .pillar-flip .pillar-grid { grid-template-columns: 7fr 5fr; }
-  .pillar-flip .pillar-text { order: 2; }
-  .pillar-flip .pillar-media { order: 1; }
-  /* 映像を大きく見せる節は、文章の下に全幅で置く */
-  .pillar-wide .pillar-grid { grid-template-columns: 1fr; gap: 48px; }
-  .pillar-wide .pillar-text { display: grid; grid-template-columns: 5fr 7fr; gap: 64px; align-items: start; }
-  .pillar-wide .pillar-text h2 { margin: 0; }
-  .pillar-wide .pillar-body { padding-top: 0.4em; }
+  .pillar .pillar-media { width: 280px; justify-self: center; }
 }
 
 /* 宣伝用モーション（柱1）。地は動画と同じ紙の色（読み込む前に色が跳ねない）。
@@ -480,7 +543,8 @@ figcaption {
   align-items: start;
   margin: 0;
 }
-.motion .media { grid-column: 1 / -1; background: var(--paper); }
+.motion .media, .motion .slot { grid-column: 1 / -1; }
+.motion .media { background: var(--paper); }
 .motion figcaption { grid-column: 1; grid-row: 2; }
 .motion .video-controls {
   grid-column: 2;
@@ -494,15 +558,14 @@ figcaption {
   background: transparent;
   color: var(--ink);
 }
-.flow .motion { margin-top: clamp(40px, 5vw, 64px); }
 
 /* ── トップ: 流れ（墨の罫で組む） ── */
 
-.flow-rows { margin: 48px 0 0; }
+.flow-rows { margin: clamp(40px, 5vw, 64px) 0 0; }
 .flow-row {
   display: grid;
   gap: 4px 48px;
-  padding: 24px 0 28px;
+  padding: clamp(14px, 2vw, 24px) 0 clamp(16px, 2.4vw, 28px);
   border-top: 2px solid var(--ink);
 }
 .flow-row dt {
@@ -514,39 +577,53 @@ figcaption {
 }
 .flow-row dd { margin: 0; max-width: 32em; }
 @media (min-width: 720px) {
-  .flow-row { grid-template-columns: 5fr 7fr; align-items: baseline; }
+  .flow-row { grid-template-columns: 7em 1fr; align-items: baseline; }
+}
+/* 広い画面では、3行の右に画面写真を並べる */
+@media (min-width: 960px) {
+  .flow-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; margin-top: clamp(40px, 5vw, 64px); }
+  .flow-grid .flow-rows, .flow-grid .screens { margin-top: 0; }
 }
 
-/* ── トップ: できること（紙と墨の罫の行。広い画面だけ2列） ── */
+/* ── トップ: できること（見出しと短い1行を、罫の行で。広い画面は2列） ── */
 
 .can-list {
   display: grid;
-  margin: 48px 0 0;
-  padding: 0;
-  list-style: none;
+  margin: 40px 0 0;
+  border-bottom: 1px solid var(--rule);
 }
-.can-list li {
-  padding: 22px 0 26px;
+.can-list > div {
+  padding: 14px 0 16px;
   border-top: 1px solid var(--rule);
 }
-.can-list h3 { margin-bottom: 6px; }
-.can-list p { max-width: 30em; color: var(--ink2); }
-@media (min-width: 960px) {
-  .can-list { grid-template-columns: 1fr 1fr; column-gap: 64px; }
-  .can-list li:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+.can-list dt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
 }
-@media (max-width: 959px) {
-  .can-list li:last-child { border-bottom: 1px solid var(--rule); }
+.can-list dd { margin: 2px 0 0; color: var(--ink2); font-size: 0.9375rem; line-height: 1.7; }
+.can-list { grid-template-columns: 1fr 1fr; column-gap: 16px; }
+@media (max-width: 719px) {
+  .can-list { margin-top: 28px; }
+  .can-list > div { padding: 12px 0 14px; }
+  .can-list dt { font-size: 0.9375rem; }
+  .can-list dd { font-size: 0.8125rem; line-height: 1.6; }
+}
+@media (min-width: 720px) {
+  .can-list { column-gap: 48px; }
+  .can-list > div { padding: 18px 0 20px; }
 }
 
 /* ── トップ: 無料とTORUTTO+ ── */
 
 .plans-grid {
   display: grid;
-  margin-top: 40px;
+  margin-top: 32px;
   border-top: 1px solid var(--rule);
 }
-.plan { padding: 32px 0; border-bottom: 1px solid var(--rule); }
+.plan { padding: clamp(20px, 3vw, 32px) 0; border-bottom: 1px solid var(--rule); }
 .plan h3 { font-size: 1.5rem; margin-bottom: 16px; }
 .plan-kind {
   margin-left: 12px;
@@ -566,13 +643,22 @@ figcaption {
 
 /* ── トップ: よくある質問の抜粋 ── */
 
-.qa-list { max-width: 42rem; margin: 40px 0 0; }
+.qa-list { max-width: 42rem; margin: clamp(24px, 4vw, 40px) 0 0; }
 .qa-list dt {
   padding-top: 24px;
   border-top: 1px solid var(--rule);
   font-weight: 700;
 }
 .qa-list dd { margin: 8px 0 24px; }
+/* 答えは3行まで見せて、続きはサポートのページへ */
+.qa-a {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  color: var(--ink2);
+}
 .more-link { margin-top: 8px; }
 
 /* ── 締め ── */
@@ -747,23 +833,24 @@ figcaption {
 /* ── トップ: 内蔵の色（試験用の色の帯を各色の表に通した見本。映像ではない） ── */
 
 .looks-body { margin-top: 24px; }
-.looks-body p { max-width: 32em; }
-.looks-figure { margin: clamp(32px, 4vw, 56px) 0 0; }
+.looks-body p { max-width: 34em; }
+.looks-figure { margin: clamp(32px, 4vw, 48px) 0 0; }
 .looks-list {
   display: grid;
-  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.look-chip { overflow: hidden; border-radius: var(--r); }
+.look-chip { overflow: hidden; border-radius: 3px; }
 .look-chip img { width: 100%; height: auto; }
-.look-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin: 8px 0 0; }
-.look-name .mincho { font-size: 1.0625rem; letter-spacing: 0.06em; }
-.look-desc { color: var(--ink2); font-size: 0.875rem; line-height: 1.6; }
-.looks-figure figcaption { margin-top: 20px; }
+.look-name { display: grid; gap: 0; margin: 6px 0 0; }
+.look-name .mincho { font-size: 0.9375rem; letter-spacing: 0.06em; line-height: 1.5; }
+.look-desc { color: var(--ink2); font-size: 0.75rem; line-height: 1.55; }
+.looks-figure figcaption { margin-top: 16px; font-size: 0.8125rem; }
 @media (min-width: 720px) {
-  .looks-list { grid-template-columns: 1fr 1fr; gap: 28px 32px; }
+  .looks-list { grid-template-columns: repeat(4, 1fr); gap: 20px 24px; }
 }
 
 /* ── スクロールで1回だけ動く演出（build.mjs の REVEAL_SCRIPT）。<html class="js"> のときだけ隠す ── */
@@ -831,13 +918,19 @@ html.js .looks-list[data-rv] .look-name {
 }
 html.js .looks-list.in .look-chip { clip-path: inset(0 0 0 0); }
 html.js .looks-list.in .look-name { opacity: 1; }
-html.js .can-list[data-rv] > li {
+html.js .can-list[data-rv] > div,
+html.js .screens[data-rv] > li,
+html.js .compare[data-rv] > figure {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
   transition-delay: calc(var(--i, 0) * 45ms);
 }
-html.js .can-list.in > li { opacity: 1; transform: none; }
+html.js .screens[data-rv] > li,
+html.js .compare[data-rv] > figure { transition-delay: calc(var(--i, 0) * 120ms); }
+html.js .can-list.in > div,
+html.js .screens.in > li,
+html.js .compare.in > figure { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
