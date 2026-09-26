@@ -445,12 +445,12 @@ figcaption {
 }
 .section-lead { max-width: 34em; margin: 24px 0 0; }
 
-/* アプリの画面写真（縦）を3枚並べる。狭い画面でも3列のまま小さく */
+/* アプリの画面写真（縦）を4枚（撮影→一覧→完成中→完成）並べる。狭い画面は2列×2段 */
 .screens {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: clamp(10px, 2.4vw, 32px);
-  max-width: 760px;
+  max-width: 1000px;
   margin: clamp(40px, 5vw, 64px) 0 0;
   padding: 0;
   list-style: none;
@@ -458,6 +458,7 @@ figcaption {
 .media.screen { border-radius: clamp(8px, 1.6vw, 18px); }
 .screens .media.screen { aspect-ratio: 9 / 19.5; }
 .screens .slot-file { display: none; }
+@media (min-width: 720px) { .screens { grid-template-columns: repeat(4, 1fr); } }
 
 /* 完成した一本・Logのビフォーアフター */
 .finished .slot-figure { margin-top: clamp(32px, 4vw, 48px); }
@@ -472,6 +473,10 @@ figcaption {
 @media (max-width: 719px) {
   .compare .motion { grid-template-rows: 1fr auto; }
   .compare .slot { aspect-ratio: auto; height: 100%; min-height: 96px; }
+  /* 映像が入ると一時停止のボタンが付く。2列では横に並ぶ幅が無いので、見出しの下へ回す */
+  .compare .motion:has(.video-controls) { grid-template-rows: auto auto auto; }
+  .compare .motion figcaption { grid-column: 1 / -1; }
+  .compare .motion .video-controls { grid-column: 1 / -1; grid-row: 3; }
 }
 @media (min-width: 720px) { .compare { gap: 32px; } }
 
@@ -579,11 +584,7 @@ figcaption {
 @media (min-width: 720px) {
   .flow-row { grid-template-columns: 7em 1fr; align-items: baseline; }
 }
-/* 広い画面では、3行の右に画面写真を並べる */
-@media (min-width: 960px) {
-  .flow-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; margin-top: clamp(40px, 5vw, 64px); }
-  .flow-grid .flow-rows, .flow-grid .screens { margin-top: 0; }
-}
+/* 画面写真は4枚あるので、広い画面でも3行の下に横一列で並べる（右の列に入れると1枚が小さすぎる） */
 
 /* ── トップ: できること（見出しと短い1行を、罫の行で。広い画面は2列） ── */
 

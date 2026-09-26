@@ -26,7 +26,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/ZenKakuGothicNew-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ZenOldMincho-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=bfd2d1dd">
+<link rel="stylesheet" href="assets/site.css?v=3cb07d2f">
 <script>(function(d){if(!window.TORUTTO_STILL&&'IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))d.className+=' js';})(document.documentElement)</script>
 </head>
 <body>
@@ -101,9 +101,10 @@
       </div>
     </dl>
     <ul class="screens" data-rv="stagger">
-      <li><div class="slot slot-screen"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>撮影の画面</b>が入ります</p><p class="slot-ask">iPhoneの縦の画面写真</p><p class="slot-file">screen-capture.png</p></div></li>
-      <li><div class="slot slot-screen"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>Vlogの一覧</b>が入ります</p><p class="slot-ask">iPhoneの縦の画面写真</p><p class="slot-file">screen-list.png</p></div></li>
-      <li><div class="slot slot-screen"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>完成の画面</b>が入ります</p><p class="slot-ask">iPhoneの縦の画面写真</p><p class="slot-file">screen-finish.png</p></div></li>
+      <li><div class="media screen"><picture><source type="image/avif" srcset="media/slot-screen-capture-480.avif 480w, media/slot-screen-capture-960.avif 960w, media/slot-screen-capture-1179.avif 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw"><img src="media/slot-screen-capture-960.jpg" srcset="media/slot-screen-capture-480.jpg 480w, media/slot-screen-capture-960.jpg 960w, media/slot-screen-capture-1179.jpg 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw" width="1179" height="2556" alt="TORUTTOの撮影の画面" loading="lazy" decoding="async"></picture></div></li>
+      <li><div class="media screen"><picture><source type="image/avif" srcset="media/slot-screen-list-480.avif 480w, media/slot-screen-list-960.avif 960w, media/slot-screen-list-1179.avif 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw"><img src="media/slot-screen-list-960.jpg" srcset="media/slot-screen-list-480.jpg 480w, media/slot-screen-list-960.jpg 960w, media/slot-screen-list-1179.jpg 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw" width="1179" height="2556" alt="TORUTTOのVlogの一覧の画面" loading="lazy" decoding="async"></picture></div></li>
+      <li><div class="media screen"><picture><source type="image/avif" srcset="media/slot-screen-finishing-480.avif 480w, media/slot-screen-finishing-960.avif 960w, media/slot-screen-finishing-1179.avif 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw"><img src="media/slot-screen-finishing-960.jpg" srcset="media/slot-screen-finishing-480.jpg 480w, media/slot-screen-finishing-960.jpg 960w, media/slot-screen-finishing-1179.jpg 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw" width="1179" height="2556" alt="TORUTTOで完成Vlogを作っている途中の画面" loading="lazy" decoding="async"></picture></div></li>
+      <li><div class="media screen"><picture><source type="image/avif" srcset="media/slot-screen-finish-480.avif 480w, media/slot-screen-finish-960.avif 960w, media/slot-screen-finish-1179.avif 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw"><img src="media/slot-screen-finish-960.jpg" srcset="media/slot-screen-finish-480.jpg 480w, media/slot-screen-finish-960.jpg 960w, media/slot-screen-finish-1179.jpg 1179w" sizes="(min-width: 1120px) 230px, (min-width: 720px) 21vw, 44vw" width="1179" height="2556" alt="TORUTTOの完成の画面" loading="lazy" decoding="async"></picture></div></li>
     </ul>
     </div>
   </div>
@@ -112,9 +113,9 @@
 <section class="section finished" aria-labelledby="finished-title">
   <div class="wrap">
     <h2 id="finished-title" data-rv="title"><span class="rv-ln"><span>完成した、</span></span><span class="rv-ln"><span>一本。</span></span></h2>
-    <p class="section-lead">日付とコメント、話した声の字幕まで入った、TORUTTOで仕上げたVlogの一部です。</p>
+    <p class="section-lead">日付と、時刻つきのコメントが入った、TORUTTOで仕上げたVlogの一部です。</p>
     <figure class="motion slot-figure">
-      <div class="slot slot-video"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>TORUTTOで仕上げたVlogの一部</b>が入ります</p><p class="slot-ask">日付・コメント・字幕が入ったところを20〜30秒。横16:9（作例1）</p><p class="slot-file">finished-vlog.mp4</p></div>
+      <div class="media" style="aspect-ratio:1920/1080"><video class="site-video" muted playsinline loop preload="metadata" poster="slots/finished-vlog.jpg" width="1920" height="1080" aria-label="TORUTTOで仕上げたVlogの一部。公園と自販機の場面に、日付と時刻つきのコメントが入っている（はじめは音なし。「音を出す」で音が出ます）"><source src="slots/finished-vlog.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button><button class="video-toggle video-sound" type="button" hidden data-on="音を出す" data-off="音を消す">音を出す</button></span>
     </figure>
   </div>
 </section>
@@ -128,11 +129,11 @@
     </div>
     <div class="compare" data-rv="stagger">
       <figure class="motion slot-figure">
-        <div class="slot slot-video"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>Logのまま撮った映像</b>が入ります</p><p class="slot-ask">Apple Logで、色を焼かずに5〜10秒。横</p><p class="slot-file">log-before.mp4</p></div>
+        <div class="media" style="aspect-ratio:1920/1080"><video class="site-video" muted playsinline loop preload="metadata" poster="slots/log-before.jpg" width="1920" height="1080" aria-label="Apple Logのまま撮った、色の薄い映像（音声なし）"><source src="slots/log-before.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></span>
         <figcaption>Logのまま</figcaption>
       </figure>
       <figure class="motion slot-figure">
-        <div class="slot slot-video"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>同じ映像に色「記録」を当てたもの</b>が入ります</p><p class="slot-ask">Logの映像があれば、アプリと同じ表を当ててこちらで作れます</p><p class="slot-file">log-after.mp4</p></div>
+        <div class="media" style="aspect-ratio:1920/1080"><video class="site-video" muted playsinline loop preload="metadata" poster="slots/log-after.jpg" width="1920" height="1080" aria-label="同じ映像に、内蔵の色「記録」を当てたもの（音声なし）"><source src="slots/log-after.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></span>
         <figcaption>色「記録」</figcaption>
       </figure>
     </div>
@@ -153,7 +154,7 @@
       </div>
     </div>
     <div class="pillar-media">
-      <div class="slot slot-screen"><span class="slot-tag">仮</span><p class="slot-title">ここに<b>iPhoneの中で処理している画面</b>が入ります</p><p class="slot-ask">字幕か、顔を隠すの画面など。縦の画面写真</p><p class="slot-file">screen-privacy.png</p></div>
+      <div class="media screen"><picture><source type="image/avif" srcset="media/slot-screen-privacy-480.avif 480w, media/slot-screen-privacy-960.avif 960w, media/slot-screen-privacy-1179.avif 1179w" sizes="(min-width: 960px) 300px, 45vw"><img src="media/slot-screen-privacy-960.jpg" srcset="media/slot-screen-privacy-480.jpg 480w, media/slot-screen-privacy-960.jpg 960w, media/slot-screen-privacy-1179.jpg 1179w" sizes="(min-width: 960px) 300px, 45vw" width="1179" height="2556" alt="TORUTTOの素材を直す画面。顔を自動で隠す設定と、隠し方（モザイク・すりガラス）を選ぶところ" loading="lazy" decoding="async"></picture></div>
     </div>
   </div>
 </section>
