@@ -26,9 +26,10 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/ZenKakuGothicNew-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ZenOldMincho-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=2f01a74a">
+<link rel="stylesheet" href="assets/site.css?v=5663afd7">
+<script>(function(d){if(!window.TORUTTO_STILL&&'IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))d.className+=' js';})(document.documentElement)</script>
 </head>
-<body class="has-opening">
+<body>
 <a class="skip-link" href="#main">本文へ移動</a>
 <header class="site-header">
   <div class="wrap">
@@ -43,20 +44,28 @@
 </header>
 <main id="main">
 <section class="opening" aria-labelledby="hero-title">
-  <figure class="opening-media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/hero-1440.jpg" width="1280" height="720" aria-label="撮った順に、桜と空、湖とボート、街の夕焼け、なでられる猫、器のごはんの短い映像がつながる動画（音声なし）"><source src="media/hero.mp4" type="video/mp4"></video><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></figure><div class="opening-shade" aria-hidden="true"></div>
-  <div class="opening-title">
-    <div class="wrap">
-      <h1 id="hero-title">撮るだけで、<wbr>投稿できる<wbr>Vlogに。</h1>
-      <div class="obi" aria-hidden="true"><i class="sky" style="flex:3"></i><i class="leaf" style="flex:4"></i><i class="sakura" style="flex:7"></i><i class="lemon" style="flex:4"></i><i class="amber" style="flex:3"></i></div>
-      <p class="lead">撮った順のまま、<wbr>色と文字と音をととのえて、<wbr>横型の一本に仕上げる<wbr>iPhoneのカメラです。</p>
-      <div class="store-cta"><p class="availability"><span class="status">App Storeで近日公開</span><span>iPhone（iOS 26以上）</span><span>本体無料</span></p></div>
+  <div class="wrap">
+    <div class="opening-stage">
+      <figure class="motion reel">
+        <div class="media"><video class="site-video" muted autoplay playsinline loop preload="auto" poster="media/reel.jpg" width="1920" height="1080" aria-label="TORUTTO（トルット）の15秒の紹介動画（音楽と効果音つき。はじめは音なし）。紙の地に琥珀色の区画が現れて窓が開き、桜と空、湖とボート、街の夕焼け、なでられる猫、器のごはんが撮った順に映り、窓の下に色の帯が1つずつ並ぶ。撮った日付ごとの小さな窓が並んだあと、帯が一本につながり、雰囲気・タイトル・字幕・BGM・声がのった一本になる。トルンが出てきてアプリのアイコンの形になり、「TORUTTO（トルット） 撮るだけで、投稿できるVlogに。 App Storeで近日公開」で終わる"><source src="media/reel.mp4" type="video/mp4"></video><script>(function(v){if(window.TORUTTO_STILL||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){v.removeAttribute('autoplay');v.autoplay=false;v.preload='none';v.dataset.stopped='1';}})(document.currentScript.previousElementSibling)</script></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button><button class="video-toggle video-sound" type="button" hidden data-on="音を出す" data-off="音を消す">音を出す</button></span>
+      </figure>
+      <div class="opening-text">
+        <div class="opening-head">
+          <h1 id="hero-title">撮るだけで、<wbr>投稿できる<wbr>Vlogに。</h1>
+          <div class="obi" aria-hidden="true"><i class="sky" style="flex:3"></i><i class="leaf" style="flex:4"></i><i class="sakura" style="flex:7"></i><i class="lemon" style="flex:4"></i><i class="amber" style="flex:3"></i></div>
+        </div>
+        <div class="opening-body">
+          <p class="lead">撮った順のまま、<wbr>色と文字と音をととのえて、<wbr>横型の一本に仕上げる<wbr>iPhoneのカメラです。</p>
+          <div class="store-cta"><p class="availability"><span class="status">App Storeで近日公開</span><span>iPhone（iOS 26以上）</span><span>本体無料</span></p></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section concern" aria-labelledby="concern-title">
   <div class="wrap">
-    <h2 id="concern-title">撮るのは好きなのに、<wbr>編集で止まる。</h2>
+    <h2 id="concern-title" data-rv="title"><span class="rv-ln"><span>撮るのは好きなのに、</span></span><span class="rv-ln"><span>編集で止まる。</span></span></h2>
     <ul class="concern-list">
       <li>並べる、切る、色、文字、音楽、書き出し。毎回ぜんぶを決めるのは、しんどい。</li>
       <li>何でもできるアプリほど、何もしないまま閉じてしまう。</li>
@@ -68,8 +77,8 @@
 
 <section class="section order" aria-labelledby="p1-title">
   <div class="wrap">
-    <h2 id="p1-title">撮るだけで、<wbr>一本になる。</h2>
-    <div class="blocks" role="img" aria-label="3秒、5秒の短いクリップ、4分32秒話したところ、10秒、3秒の短いクリップが、撮った順に並んだ帯">
+    <h2 id="p1-title" data-rv="title"><span class="rv-ln"><span>撮るだけで、</span></span><span class="rv-ln"><span>一本になる。</span></span></h2>
+    <div class="blocks" data-rv="snap" role="img" aria-label="3秒、5秒の短いクリップ、4分32秒話したところ、10秒、3秒の短いクリップが、撮った順に並んだ帯">
       <div class="b3 sky"><b>3</b><small>秒</small></div>
       <div class="b5 leaf"><b>5</b><small>秒</small></div>
       <div class="btalk sakura"><small>話す</small><b>4:32</b></div>
@@ -81,17 +90,13 @@
       <p>撮った順のまま、素材がVlogの形に並びます。はじまりと終わり、タイトルとサムネイルまで、ひと続きで仕上がります。</p>
       <p>アプリが勝手に並べ替えることはありません。元の素材も書き換えません。</p>
     </div>
-    <figure class="motion">
-      <div class="media"><video class="site-video" muted playsinline loop preload="metadata" poster="media/motion-strip.jpg" width="1280" height="720" aria-label="撮った順の5つの短い映像（桜と空、湖とボート、街の夕焼け、猫、ごはん）が帯の上に並び、一本の横長の映像になって流れる動画（音声なし）。見出し「撮るだけで、投稿できるVlogに。」が出て、最後にトルットのアイコンになる"><source src="media/motion-strip.mp4" type="video/mp4"></video></div><span class="video-controls"><button class="video-toggle" type="button" hidden data-play="再生" data-pause="一時停止">再生</button></span>
-      <figcaption>撮った順に、そのまま並びます。</figcaption>
-    </figure>
   </div>
 </section>
 
 <section class="section pillar pillar-wide" aria-labelledby="p2-title">
   <div class="wrap pillar-grid">
     <div class="pillar-text">
-      <h2 id="p2-title">選ぶのは、<wbr>雰囲気だけ。</h2>
+      <h2 id="p2-title" data-rv="title"><span class="rv-ln"><span>選ぶのは、</span></span><span class="rv-ln"><span>雰囲気だけ。</span></span></h2>
       <div class="pillar-body">
         <p>日常・やわらか・シネマ。雰囲気を1つ選ぶと、仕上がりの項目が一度にそろいます。</p>
         <p>迷うところは、先に決めておきました。どれを選んでも、ちゃんと整います。</p>
@@ -103,10 +108,24 @@
   </div>
 </section>
 
+<section class="section looks" aria-labelledby="looks-title">
+  <div class="wrap">
+    <h2 id="looks-title" data-rv="title"><span class="rv-ln"><span>内蔵の色は、</span></span><span class="rv-ln"><span>6つと標準。</span></span></h2>
+    <div class="looks-body">
+      <p>TORUTTOの色づくりのプロジェクト「LUT FACTORY」で、自作の数式から一から作りました。</p>
+      <p>1つの色につき、65×65×65の細かい表を使います。<span class="nowrap">Apple Log</span>で撮った素材には、変換まで含めた専用の表を用意しています。強さと粒も選べます。</p>
+    </div>
+    <figure class="looks-figure">
+      <ol class="looks-list" data-rv="stagger"><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-standard-480.avif 480w, media/look-standard-960.avif 960w, media/look-standard-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-standard-960.jpg" srcset="media/look-standard-480.jpg 480w, media/look-standard-960.jpg 960w, media/look-standard-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「標準」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">標準</span><span class="look-desc">色の表を通さない、元の色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-reportage-480.avif 480w, media/look-reportage-960.avif 960w, media/look-reportage-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-reportage-960.jpg" srcset="media/look-reportage-480.jpg 480w, media/look-reportage-960.jpg 960w, media/look-reportage-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Reportage」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Reportage</span><span class="look-desc">記録写真のような、落ち着いた濃さと素直な色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-quiet-480.avif 480w, media/look-quiet-960.avif 960w, media/look-quiet-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-quiet-960.jpg" srcset="media/look-quiet-480.jpg 480w, media/look-quiet-960.jpg 960w, media/look-quiet-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Quiet」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Quiet</span><span class="look-desc">彩度を抑えた、静かでやわらかな色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-snapshot-480.avif 480w, media/look-snapshot-960.avif 960w, media/look-snapshot-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-snapshot-960.jpg" srcset="media/look-snapshot-480.jpg 480w, media/look-snapshot-960.jpg 960w, media/look-snapshot-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Snapshot」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Snapshot</span><span class="look-desc">スナップ写真のような、明るく軽やかな色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-forest-480.avif 480w, media/look-forest-960.avif 960w, media/look-forest-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-forest-960.jpg" srcset="media/look-forest-480.jpg 480w, media/look-forest-960.jpg 960w, media/look-forest-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Forest」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Forest</span><span class="look-desc">緑を深く落ち着かせる、映画のような色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-earth-480.avif 480w, media/look-earth-960.avif 960w, media/look-earth-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-earth-960.jpg" srcset="media/look-earth-480.jpg 480w, media/look-earth-960.jpg 960w, media/look-earth-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Earth」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Earth</span><span class="look-desc">土や木の暖かさを生かした、渋めの色。</span></p></li><li><div class="look-chip"><picture><source type="image/avif" srcset="media/look-teal-orange-480.avif 480w, media/look-teal-orange-960.avif 960w, media/look-teal-orange-1200.avif 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw"><img src="media/look-teal-orange-960.jpg" srcset="media/look-teal-orange-480.jpg 480w, media/look-teal-orange-960.jpg 960w, media/look-teal-orange-1200.jpg 1200w" sizes="(min-width: 1248px) 584px, (min-width: 720px) 48vw, 100vw" width="1200" height="150" alt="試験用の色の帯（灰色の段階・肌の色・空・木の緑・夕焼け・色相）を「Teal &amp; Orange」の色の表に通した見本" loading="lazy" decoding="async"></picture></div><p class="look-name"><span class="mincho">Teal &amp; Orange</span><span class="look-desc">肌の暖かさと青緑の影を対比させる色。</span></p></li></ol>
+      <figcaption>映像ではなく、色の見本です。左から、灰色の段階・肌の色・空・木の緑・夕焼け・色相の帯を、それぞれの色の表に通しました。</figcaption>
+    </figure>
+  </div>
+</section>
+
 <section class="section pillar" aria-labelledby="p3-title">
   <div class="wrap pillar-grid">
     <div class="pillar-text">
-      <h2 id="p3-title">あなたの日々は、<wbr>iPhoneの中に。</h2>
+      <h2 id="p3-title" data-rv="title"><span class="rv-ln"><span>あなたの日々は、</span></span><span class="rv-ln"><span>iPhoneの中に。</span></span></h2>
       <div class="pillar-body">
         <p>撮った動画も声も、iPhoneの外へは送りません。字幕の文字起こしも、顔を隠すための解析も、iPhoneの中で行います。</p>
         <p>アカウント登録はありません。広告も、利用状況を追いかける仕組みも入っていません。</p>
@@ -121,7 +140,7 @@
 <section class="section pillar pillar-flip" aria-labelledby="p4-title">
   <div class="wrap pillar-grid">
     <div class="pillar-text">
-      <h2 id="p4-title">無料で、<wbr>ちゃんと一本。</h2>
+      <h2 id="p4-title" data-rv="title"><span class="rv-ln"><span>無料で、</span></span><span class="rv-ln"><span>ちゃんと一本。</span></span></h2>
       <div class="pillar-body">
         <p>撮影から完成まで、無料のままで全部できます。1080p・10分までの一本に、ロゴは入りません。</p>
         <p>月額の支払いもありません。</p>
@@ -135,8 +154,8 @@
 
 <section class="section flow" aria-labelledby="flow-title">
   <div class="wrap">
-    <h2 id="flow-title">撮る、<wbr>ととのう、<wbr>完成。</h2>
-    <dl class="flow-rows">
+    <h2 id="flow-title" data-rv="title"><span class="rv-ln"><span>撮る、</span></span><span class="rv-ln"><span>ととのう、</span></span><span class="rv-ln"><span>完成。</span></span></h2>
+    <dl class="flow-rows" data-rv="rule">
       <div class="flow-row">
         <dt>撮る</dt>
         <dd>話すところは止めるまで、景色や手元は<span class="nowrap">3・5・10秒</span>で、その日を撮ります。写真アプリの動画も取り込めます。</dd>
@@ -159,8 +178,8 @@
 
 <section class="section can" aria-labelledby="can-title">
   <div class="wrap">
-    <h2 id="can-title">できること</h2>
-    <ul class="can-list">
+    <h2 id="can-title" data-rv="title"><span class="rv-ln"><span>できること</span></span></h2>
+    <ul class="can-list" data-rv="stagger">
       <li>
         <h3>ほかのカメラの動画も、一本に</h3>
         <p><span class="nowrap">Blackmagic Camera</span>や標準のカメラの動画も取り込めて、色を決めて書き出した素材は、その色のまま使います。</p>
@@ -187,7 +206,7 @@
       </li>
       <li>
         <h3>Apple Logで撮れる</h3>
-        <p>対応するiPhone（Proモデル）では、<span class="nowrap">Apple Log</span>で撮って、見やすい色に仕上げます。</p>
+        <p>対応するiPhone（Proモデル）では、<span class="nowrap">Apple Log</span>で撮り、変換まで含めた専用の色の表で、見やすい色に仕上げます。</p>
       </li>
       <li>
         <h3>映った顔を隠せる</h3>
@@ -207,13 +226,14 @@
 
 <section class="section plans" aria-labelledby="plans-title">
   <div class="wrap">
-    <h2 id="plans-title">無料と、<wbr>TORUTTO+</h2>
+    <h2 id="plans-title" data-rv="title"><span class="rv-ln"><span>無料と、</span></span><span class="rv-ln"><span>TORUTTO+</span></span></h2>
     <div class="plans-grid">
       <div class="plan">
         <h3>無料</h3>
         <ul>
           <li>撮影から完成まで、全部の流れ</li>
           <li>1080p・10分までの一本</li>
+          <li>内蔵の色6つと標準、BGM 14曲</li>
           <li>完成動画にロゴは入りません</li>
         </ul>
       </div>
@@ -233,8 +253,8 @@
 
 <section class="section faq-excerpt" aria-labelledby="faq-title">
   <div class="wrap">
-    <h2 id="faq-title">よくある質問</h2>
-    <dl class="qa-list"><dt>無料でどこまでできますか？</dt><dd>撮るところから一本を完成させるまで、全部の流れを無料で使えます。完成した動画は横16:9、1080p、10分までで、<strong>透かし（ロゴ）は入りません</strong>。内蔵のBGM 14曲、色のルック4つ（日和・灯・宵・凪）、雰囲気3つ（日常・やわらか・シネマ）、字幕、顔を隠す機能、あとから声を足す機能、まとめVlogも無料です。 <a href="support/#q-2">続きを読む<span class="visually-hidden">（無料でどこまでできますか？）</span></a></dd><dt>撮った動画はiPhoneの外へ送られますか？</dt><dd>送られません。撮った動画、声、コメント、字幕は、あなたのiPhoneの中だけで扱います。運営者のサーバーも、外部のAIサービスも使っていません。広告や、利用状況を追いかける仕組みもありません。 <a href="support/#q-21">続きを読む<span class="visually-hidden">（撮った動画はiPhoneの外へ送られますか？）</span></a></dd><dt>TORUTTO+は買い切りですか？</dt><dd>はい、買い切りです。一度買えば、月ごと・年ごとの支払いはありません。値段は、App Storeの購入画面に表示される価格です。TORUTTO+で増えるのは、4Kでの完成、10分より長い一本、自分のLUT（.cube）の読み込み、自分の曲の読み込みの4つです。 <a href="support/#q-17">続きを読む<span class="visually-hidden">（TORUTTO+は買い切りですか？）</span></a></dd></dl>
+    <h2 id="faq-title" data-rv="title"><span class="rv-ln"><span>よくある質問</span></span></h2>
+    <dl class="qa-list"><dt>無料でどこまでできますか？</dt><dd>撮るところから一本を完成させるまで、全部の流れを無料で使えます。完成した動画は横16:9、1080p、10分までで、<strong>透かし（ロゴ）は入りません</strong>。内蔵のBGM 14曲、内蔵の色6つ（Reportage・Quiet・Snapshot・Forest・Earth・Teal &amp; Orange）と標準、雰囲気3つ（日常・やわらか・シネマ）、字幕、顔を隠す機能、あとから声を足す機能、まとめVlogも無料です。 <a href="support/#q-2">続きを読む<span class="visually-hidden">（無料でどこまでできますか？）</span></a></dd><dt>撮った動画はiPhoneの外へ送られますか？</dt><dd>送られません。撮った動画、声、コメント、字幕は、あなたのiPhoneの中だけで扱います。運営者のサーバーも、外部のAIサービスも使っていません。広告や、利用状況を追いかける仕組みもありません。 <a href="support/#q-21">続きを読む<span class="visually-hidden">（撮った動画はiPhoneの外へ送られますか？）</span></a></dd><dt>TORUTTO+は買い切りですか？</dt><dd>はい、買い切りです。一度買えば、月ごと・年ごとの支払いはありません。値段は、App Storeの購入画面に表示される価格です。TORUTTO+で増えるのは、4Kでの完成、10分より長い一本、自分のLUT（.cube）の読み込み、自分の曲の読み込みの4つです。 <a href="support/#q-17">続きを読む<span class="visually-hidden">（TORUTTO+は買い切りですか？）</span></a></dd></dl>
     <p class="more-link"><a href="support/">ほかの質問を見る</a></p>
   </div>
 </section>
@@ -301,6 +321,18 @@
     if (reduce) return;
     if (io) io.observe(v);
     else { var p = v.play(); if (p && p.catch) p.catch(label); }
+  });
+})();
+</script>
+<script>
+(function () {
+  if (!/(^|\s)js(\s|$)/.test(document.documentElement.className)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0 });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rv]'), function (el) {
+    Array.prototype.forEach.call(el.children, function (c, i) { c.style.setProperty('--i', i); });
+    io.observe(el);
   });
 })();
 </script>
