@@ -961,3 +961,8 @@ html.js .compare.in > figure { opacity: 1; transform: none; }
 .notfound .torun-spot { display: block; margin: 0 0 8px -6px; }
 .page-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .page-head-row .torun-spot { flex: none; margin-top: -4px; }
+
+/* ── つくった人から（じゅんの言葉。整えるのは言い回しだけ） ── */
+.maker-body { max-width: 34em; margin-top: clamp(24px, 3vw, 40px); }
+.maker-body p { line-height: 2; }
+.maker-sign { margin-top: 1.6em; color: var(--ink2); font-size: 0.9375rem; }
