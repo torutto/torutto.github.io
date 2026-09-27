@@ -337,6 +337,7 @@ figcaption {
 }
 .availability .status { color: var(--ink); font-weight: 700; }
 .store-cta { display: grid; gap: 16px; justify-items: start; }
+.store-promise { margin: -8px 0 0; color: var(--ink); font-size: 0.9375rem; }
 
 /* ── トップ: 冒頭（15秒のリールが主役） ──
    ヘッダーの下に16:9のリール、その下に明朝の見出し。リールは紙の地で作られているので、上に文字を重ねない。
