@@ -169,13 +169,11 @@ a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
   min-height: 44px;
   text-decoration: none;
 }
-.brand-icon img { width: 32px; height: 32px; border-radius: 7px; }
-.brand-name {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.0625rem;
-  letter-spacing: 0.14em;
-}
+.download-grid.icon-download { grid-template-columns: 1fr; max-width: 240px; margin-bottom: 32px; }
+.brand-wordmark { display: block; width: 156.72px; height: auto; }
+.wordmark-heading img { display: block; width: min(100%, 357.6px); height: auto; }
+.plan-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.plan-brand img { display: block; width: 178.8px; height: auto; }
 .site-nav { display: flex; align-items: center; gap: 8px; }
 .site-nav ul {
   display: flex;
@@ -211,13 +209,11 @@ a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
 .brand-name,
 .site-nav a { white-space: nowrap; }
 @media (min-width: 720px) {
-  .brand-icon img { width: 36px; height: 36px; border-radius: 8px; }
-  .brand-name { font-size: 1.25rem; }
+  .brand-wordmark { width: 182.84px; }
   .site-nav a { padding-inline: 12px; font-size: 0.9375rem; }
 }
 @media (max-width: 380px) {
   .brand { gap: 8px; }
-  .brand-name { letter-spacing: 0.1em; }
   .site-nav a { padding-inline: 6px; }
 }
 
