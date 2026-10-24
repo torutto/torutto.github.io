@@ -1,7 +1,7 @@
 /* TORUTTO 公式サイト — アプリと共通のニュートラルグレーと丸ゴシック。
    明暗の地・面・文字を分け、オレンジを選択・リンク、グリーンを成功に使う。
    帯はグレーの濃淡で撮影順を表し、最後の1区画だけオレンジ。
-   文言・ページ構成・映像素材はそのまま、端末の明暗設定に合わせる。 */
+   表示はいつもライトグレー（2026-10-24 じゅん。端末の明暗に合わせない）。 */
 
 @font-face {
   font-family: "TORUTTO Rounded Display";
@@ -17,7 +17,7 @@
 }
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --paper: #E8E8EA;
   --surface: #FAFAFC;
   --ink: #252528;
@@ -49,26 +49,6 @@
   --narrow: 42rem;
   --section: clamp(56px, 10vw, 140px);
   font-synthesis: none;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #161618;
-    --surface: #242427;
-    --ink: #F4F4F5;
-    --ink2: #B6B6BC;
-    --rule: #424248;
-    --amber-text: #FF7A28;
-    --success: #66D9A3;
-    --action-surface: #44444A;
-    --action-foreground: #F4F4F5;
-    --card-border: #3C3C42;
-    --media-edge: rgba(244, 244, 245, 0.08);
-    --strip-1: #6C6C72;
-    --strip-2: #64646A;
-    --strip-3: #68686E;
-    --strip-4: #66666C;
-    --strip-ink: #F4F4F5;
-  }
 }
 @media (min-width: 720px) {
   :root { --gutter: 48px; }
