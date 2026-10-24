@@ -1,6 +1,6 @@
 /* TORUTTO 公式サイト — E1「映画の明朝」（launch/brand/BRAND.md §5、見本は launch/moods/e1.html）
    冒頭は紙の地に15秒のリール、その下に墨の明朝の見出し。全体が明るい紙の地と墨。
-   帯の色（空・若草・さくら・レモン・琥珀）は帯の区画にだけ使い、帯は冒頭の見出しの下と「撮った順」の節だけに置く。
+   帯の色（空・若草・さくら・レモン・オレンジ）は帯の区画にだけ使い、帯は冒頭の見出しの下と「撮った順」の節だけに置く。
    明るい表示だけ（ダーク用の色は持たない）。 */
 
 @font-face {
@@ -31,8 +31,7 @@
   --ink: #2E241F;
   --ink2: #6B6053;
   --rule: #E4DCCF;
-  --amber: #FA9C1A;
-  --amber-text: #A26511;
+  --amber: #FF7A28; /* 名前は旧いまま。値はアプリのアクセント（HIKARIのオレンジ） */
   /* 帯の区画だけの色 */
   --sky: #9CCBE3;
   --leaf: #B3D38A;
@@ -170,10 +169,10 @@ a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
   text-decoration: none;
 }
 .download-grid.icon-download { grid-template-columns: 1fr; max-width: 240px; margin-bottom: 32px; }
-.brand-wordmark { display: block; width: 156.72px; height: auto; }
-.wordmark-heading img { display: block; width: min(100%, 357.6px); height: auto; }
+.brand-wordmark { display: block; width: 174.24px; height: auto; }
+.wordmark-heading img { display: block; width: min(100%, 392.64px); height: auto; }
 .plan-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
-.plan-brand img { display: block; width: 178.8px; height: auto; }
+.plan-brand img { display: block; width: 196.32px; height: auto; }
 .site-nav { display: flex; align-items: center; gap: 8px; }
 .site-nav ul {
   display: flex;
@@ -209,7 +208,7 @@ a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
 .brand-name,
 .site-nav a { white-space: nowrap; }
 @media (min-width: 720px) {
-  .brand-wordmark { width: 182.84px; }
+  .brand-wordmark { width: 203.28px; }
   .site-nav a { padding-inline: 12px; font-size: 0.9375rem; }
 }
 @media (max-width: 380px) {
@@ -313,7 +312,7 @@ figcaption {
   cursor: pointer;
 }
 
-/* 帯: 撮った順に並んだ区画。空→若草→さくら→レモン→琥珀（最後の1区画だけ琥珀） */
+/* 帯: 撮った順に並んだ区画。空→若草→さくら→レモン→オレンジ（最後の1区画だけオレンジ） */
 .obi { display: flex; gap: 5px; }
 .obi i { display: block; border-radius: 3px; }
 .sky { background: var(--sky); }
@@ -939,11 +938,11 @@ html.js .compare.in > figure { opacity: 1; transform: none; }
   }
 }
 
-/* ── トルン（launch/torun/torun.js。BRAND.md §7）: 脇役の所だけ、1画面に1体。横長なので枠は 4:3 ── */
+/* ── トルン（HIKARI、launch/torun/hikari.js。BRAND.md §7）: 脇役の所だけ、1画面に1体。枠は正方形 ── */
 .torun-spot {
   display: inline-block;
   width: var(--torun, 96px);
-  height: var(--torun-h, 72px);
+  height: var(--torun, 96px);
   vertical-align: middle;
 }
 .torun-spot canvas {
