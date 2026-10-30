@@ -26,7 +26,7 @@
 <link rel="apple-touch-icon" href="https://torutto.github.io/apple-touch-icon.png?v=c53edf8c">
 <link rel="preload" href="https://torutto.github.io/fonts/MPLUSRounded1c-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="https://torutto.github.io/fonts/MPLUSRounded1c-Black.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="https://torutto.github.io/assets/site.css?v=ecdbc4ae">
+<link rel="stylesheet" href="https://torutto.github.io/assets/site.css?v=1722d60b">
 </head>
 <body>
 <a class="skip-link" href="#main">本文へ移動</a>
@@ -83,10 +83,14 @@
  *   Hikari.draw(ctx, side, state)   1辺 side の正方形に体を描く（原点は正方形の左上）
  *   Hikari.mount(canvas)            canvas に置く（data-mood="done" / data-look="down" を読む）
  *   Hikari.mountAll(selector)       当てはまる canvas を全部 mount
+ *   Hikari.outline(form, time)      5つの形の輪郭点（TorunOutline.swift と同じ式。単位正方形、96点）
  *
  * mount の動き: 見えているあいだだけ描く。ふだんは呼吸・まばたき・視線。さわると一度だけ潰れ、
  * 0.8秒以内に3回さわると一回転。data-mood="done" は初めて見えたときに一度だけ跳ねて▶へ傾き、
  * 目を細めて光る（約3秒でふだんへ戻る）。動きを減らす設定では止まった1コマ。
+ * data-forms="round,wave,spiky" は形を順に変える（約0.45秒で輪郭を滑らかに混ぜ、途中で少しぷにっと縮む。
+ * spiky は出たままにせず、驚いた一瞬だけトゲが出て戻る＝アプリの startle）。data-form-every は1つの形の秒数。
+ * data-form="round" は形を1つに決める。形の意味と場面は docs/design/TORUN_MASCOT.md「5つの形」。
  */
 (function (root) {
   'use strict';
@@ -141,6 +145,55 @@
     ctx.closePath();
   }
 
+  // ── 5つの形（TORUTTO/App/DesignSystem/TorunOutline.swift と同じ式） ──
+  var N = 96, OC = { x: 0.5, y: 0.56 };
+  var PEBBLE = (function () {
+    var curves = [
+      [[0.5, 0.08], [0.70, 0.08], [0.93, 0.53], [0.93, 0.72]],
+      [[0.93, 0.72], [0.93, 0.88], [0.77, 0.95], [0.5, 0.95]],
+      [[0.5, 0.95], [0.23, 0.95], [0.07, 0.88], [0.07, 0.72]],
+      [[0.07, 0.72], [0.07, 0.53], [0.30, 0.08], [0.5, 0.08]]
+    ];
+    var out = [];
+    curves.forEach(function (c) {
+      for (var i = 0; i < N / 4; i++) {
+        var t = i / (N / 4), u = 1 - t, a = u * u * u, b = 3 * u * u * t, cc = 3 * u * t * t, d = t * t * t;
+        out.push([a * c[0][0] + b * c[1][0] + cc * c[2][0] + d * c[3][0], a * c[0][1] + b * c[1][1] + cc * c[2][1] + d * c[3][1]]);
+      }
+    });
+    return out;
+  })();
+  function outline(form, time) {
+    if (!form || form === 'pebble') return PEBBLE;
+    return PEBBLE.map(function (p) {
+      var th = Math.atan2(p[0] - OC.x, OC.y - p[1]), r;
+      if (form === 'round') r = 0.39;
+      else if (form === 'square') r = 0.37 / Math.pow(Math.pow(Math.abs(Math.sin(th)), 5) + Math.pow(Math.abs(Math.cos(th)), 5), 1 / 5);
+      else if (form === 'wave') r = 0.37 + 0.035 * Math.sin(7 * th + 3 * time);
+      else if (form === 'spiky') r = 0.31 + 0.11 * Math.pow(Math.abs(Math.cos(4.5 * th)), 3);
+      else return p;
+      return [OC.x + r * Math.sin(th), OC.y - r * Math.cos(th)];
+    });
+  }
+  function blend(a, b, t) {
+    t = clamp(t, 0, 1);
+    if (t === 0) return a;
+    if (t === 1) return b;
+    return a.map(function (p, i) { return [p[0] + (b[i][0] - p[0]) * t, p[1] + (b[i][1] - p[1]) * t]; });
+  }
+  // 閉じた Catmull-Rom 曲線を3次ベジェで（TorunOutline.path と同じ）
+  function outlinePath(ctx, s, pts) {
+    var n = pts.length;
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0] * s, pts[0][1] * s);
+    for (var i = 0; i < n; i++) {
+      var p0 = pts[(i + n - 1) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      ctx.bezierCurveTo((p1[0] + (p2[0] - p0[0]) / 6) * s, (p1[1] + (p2[1] - p0[1]) / 6) * s,
+        (p2[0] - (p3[0] - p1[0]) / 6) * s, (p2[1] - (p3[1] - p1[1]) / 6) * s, p2[0] * s, p2[1] * s);
+    }
+    ctx.closePath();
+  }
+
   function eyes(ctx, s, st) {
     var w = s * 0.085;
     ctx.fillStyle = C.eye;
@@ -178,10 +231,12 @@
   }
 
   /*
-   * state: { time, face, working, gaze, lookingDown, done, jump, squish, spin, tilt, breatheWeight }
+   * state: { time, face, working, gaze, lookingDown, done, jump, squish, spin, tilt, breatheWeight, outline, formSquash }
    * 角度は度。jump・squish は 0〜1。
    */
   function draw(ctx, s, st) {
+    var body = st.outline ? function () { outlinePath(ctx, s, st.outline); } : function () { shape(ctx, s); };
+    var fsq = st.formSquash || 0;
     var breathe = Math.sin(st.time * 2 * Math.PI / 5.5) * (st.breatheWeight == null ? 1 : st.breatheWeight);
 
     // 薄い接地影。回っても跳ねても地面に残る（体と一緒に回さない）。
@@ -214,7 +269,7 @@
     ctx.rotate((st.spin + st.tilt) * Math.PI / 180);
     ctx.translate(-s * 0.5, -s * 0.5);
     ctx.translate(s * 0.5, s);
-    ctx.scale(1 + 0.12 * st.squish, 1 - 0.16 * st.squish);
+    ctx.scale((1 + 0.12 * st.squish) * (1 + fsq), (1 - 0.16 * st.squish) * (1 - fsq));
     ctx.translate(0, -breathe * s * 0.015);
     ctx.rotate(breathe * 2.5 * Math.PI / 180);
     ctx.translate(-s * 0.5, -s);
@@ -223,20 +278,20 @@
     fill.addColorStop(0, C.light);
     fill.addColorStop(0.5, C.body);
     fill.addColorStop(1, C.deep);
-    shape(ctx, s);
+    body();
     ctx.fillStyle = fill;
     ctx.fill();
 
     // 縁の陰影: しっとりした半つや。アプリはぼかした線を体で切り抜く。ブラウザ差を避け、
     // 幅の違う薄い線を重ねて同じ見え方にする（縁が濃く、内へなだらかに薄れる）。
     ctx.save();
-    shape(ctx, s);
+    body();
     ctx.clip();
     ctx.strokeStyle = C.rim;
     ctx.lineJoin = 'round';
     for (var k = 0; k < 8; k++) {
       ctx.lineWidth = s * (0.024 + k * 0.028);
-      shape(ctx, s);
+      body();
       ctx.stroke();
     }
     ctx.restore();
@@ -251,6 +306,10 @@
     var reduce = !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
     var wantsDone = canvas.getAttribute('data-mood') === 'done';
     var lookingDown = canvas.getAttribute('data-look') === 'down';
+    var fixedForm = canvas.getAttribute('data-form') || 'pebble';
+    var forms = (canvas.getAttribute('data-forms') || '').split(',').filter(Boolean);
+    var every = parseFloat(canvas.getAttribute('data-form-every')) || 3.2;
+    var phase = parseFloat(canvas.getAttribute('data-form-phase')) || 0;
     var st = { on: false, raf: 0, dead: false, pokedAt: -1, spunAt: -1, pokes: [], doneAt: -1, played: false };
     var t0 = performance.now();
     var now = function () { return (performance.now() - t0) / 1000; };
@@ -267,7 +326,10 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, W, H);
       ctx.translate((W - s) / 2, H - s * 1.04);
+      var f = formAt(t, done ? doneAge : Infinity);
       draw(ctx, s, {
+        outline: f.outline,
+        formSquash: f.squash,
         time: t,
         face: done ? 'happy' : 'base',
         working: spinAge < 0.8,
@@ -280,6 +342,38 @@
         tilt: done ? playTiltAt(doneAge) : 0,
         breatheWeight: 1
       });
+    }
+
+    // 形: data-forms を順に。spiky の番は、前の形のまま一瞬だけトゲが出て戻る（startle、0.9秒）。
+    // 動きを減らす設定では、形を変える途中を見せず最初の形の止め絵。
+    function formAt(t, doneAge) {
+      var out = { outline: null, squash: 0 };
+      if (!forms.length) {
+        if (fixedForm !== 'pebble') out.outline = outline(fixedForm, t);
+      } else if (reduce) {
+        out.outline = outline(forms[0] === 'spiky' ? 'pebble' : forms[0], 0);
+      } else {
+        var tt = t + phase, n = forms.length, k = Math.floor(tt / every), age = tt - k * every;
+        var shown = function (i) {
+          for (var j = 0; j < n; j++) { var fm = forms[((i - j) % n + n) % n]; if (fm !== 'spiky') return fm; }
+          return 'pebble';
+        };
+        var cur = forms[((k % n) + n) % n], now = shown(k), prev = shown(k - 1);
+        var pts = outline(now, t);
+        if (now !== prev && age < 0.45) {
+          var p = age / 0.45;
+          pts = blend(outline(prev, t), pts, p * p * (3 - 2 * p));
+          out.squash = 0.06 * Math.sin(Math.PI * p);
+        }
+        if (cur === 'spiky' && age < 0.9) {
+          var mix = age < 0.12 ? ease(age / 0.12) : age < 0.5 ? 1 : 1 - ease((age - 0.5) / 0.4);
+          pts = blend(pts, outline('spiky', t), mix);
+        }
+        out.outline = pts;
+      }
+      // 完成の跳ねの頂点で一瞬丸くなる（HikariMotion.doneRoundMix）
+      if (doneAge < 0.7) out.outline = blend(out.outline || PEBBLE, outline('round', t), 0.8 * Math.sin(Math.PI * doneAge / 0.7));
+      return out;
     }
 
     function loop() {
@@ -334,7 +428,7 @@
     return Array.prototype.map.call(document.querySelectorAll(selector), function (c) { return mount(c); });
   }
 
-  root.Hikari = { version: '1.0.0', draw: draw, mount: mount, mountAll: mountAll, blinkAt: blinkAt, colors: C };
+  root.Hikari = { version: '1.1.0', draw: draw, outline: outline, mount: mount, mountAll: mountAll, blinkAt: blinkAt, colors: C };
 })(typeof window !== 'undefined' ? window : this);
 Hikari.mountAll('canvas.torun');
 </script>
