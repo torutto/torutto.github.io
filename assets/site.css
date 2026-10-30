@@ -935,7 +935,7 @@ html.js .compare.in > figure { opacity: 1; transform: none; }
   }
 }
 
-/* ── トルン（HIKARI、launch/torun/hikari.js。BRAND.md §7）: 脇役の所だけ、1画面に1体。枠は正方形 ── */
+/* ── トルン（HIKARI、launch/torun/hikari.js。BRAND.md §7、docs/design/TORUN_MASCOT.md）。枠は正方形 ── */
 .torun-spot {
   display: inline-block;
   width: var(--torun, 96px);
@@ -953,6 +953,40 @@ html.js .compare.in > figure { opacity: 1; transform: none; }
 .notfound .torun-spot { display: block; margin: 0 0 8px -6px; }
 .page-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .page-head-row .torun-spot { flex: none; margin-top: -4px; }
+
+/* 漂うトルン: トップの各段の余白に、大きさ・傾き・形を変えて置く。文字には重ねない。
+   狭い画面は段の上の余白（--section）の中、広い画面は本文の外の左右の余白の中。 */
+.section:has(> .torun-float) { position: relative; overflow-x: clip; }
+.torun-float {
+  --ts: calc(var(--torun) * 0.75);
+  position: absolute;
+  top: calc((var(--section) - var(--ts)) / 2);
+  width: var(--ts);
+  height: var(--ts);
+  animation: torun-drift 6.5s ease-in-out var(--drift, 0s) infinite alternate;
+}
+.torun-float-right { right: var(--gutter); }
+.torun-float-left { left: var(--gutter); }
+.torun-float canvas { transform: rotate(var(--tilt, 0deg)); }
+.torun-float.torun-flat canvas { transform: rotate(var(--tilt, 0deg)) scale(1.3, 0.72); transform-origin: 50% 100%; }
+.torun-float.torun-tall canvas { transform: rotate(var(--tilt, 0deg)) scale(0.8, 1.28); transform-origin: 50% 100%; }
+.torun-float.torun-roll canvas { animation: torun-roll 14s linear infinite; }
+.torun-float.wide-only { display: none; }
+@keyframes torun-drift {
+  from { translate: 0 -5px; }
+  to { translate: 3px 6px; }
+}
+@keyframes torun-roll {
+  from { transform: rotate(var(--tilt, 0deg)); }
+  to { transform: rotate(calc(var(--tilt, 0deg) + 360deg)); }
+}
+@media (min-width: 1320px) {
+  .torun-float { --ts: var(--torun); top: var(--y, 30%); }
+  .torun-float.wide-only { display: block; }
+  /* 本文（--wrap）の外の余白のまん中 */
+  .torun-float-right { right: calc((100% - var(--wrap)) / 4 - var(--ts) / 2); }
+  .torun-float-left { left: calc((100% - var(--wrap)) / 4 - var(--ts) / 2); }
+}
 
 /* ── つくった人から（じゅんの言葉。整えるのは言い回しだけ） ── */
 .maker-body { max-width: 34em; margin-top: clamp(24px, 3vw, 40px); }
